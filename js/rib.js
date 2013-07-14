@@ -251,37 +251,49 @@ function MainView(subs, parent) {
       else
         return '#eee url(' + d.data.thumbnail + ') no-repeat center';
     }
+
+    var _hide = function(selection) {
+      selection
+        .transition()
+        .duration(500)
+        .style('width', '0px')
+        .style('margin-left', '0px')
+        .style('margin-right', '0px')
+        .style('opacity', '0')
+        .remove();
+    }
+
+    var _show = function(selection) {
+      console.debug('show');
+      selection
+        .style('background', _bg)
+        .style('opacity', '0')
+        .style('width', '0px')
+        .transition()
+        .duration(500)
+        .style('opacity', '1.0')
+        .style('width', '70px')
+    }
+
     var links = content.selectAll('span')
       .data(that.links, function(d) { return d.data.name; });
 
-    links.exit()
+    links
       .transition()
-      .duration(1000)
-      .style('width', '0px')
-      .style('margin-left', '0px')
-      .style('margin-right', '0px')
-      .style('opacity', '0')
-      .each('end', function() { links.order(); })
-      .remove();
+      .duration(500)
+      .style('left', function(d, i) { return (5 + i * 75) + 'px' });
+
+    links.exit()
+      .call(_hide);
 
     links.enter()
       .append('span')
+      .style('left', function(d, i) { return (5 + i * 75) + 'px' })
       .html(function(d) { return template({ item: d.data }); })
       .on('click', that.display)
       .attr('class', 'thumbnail')
-      .style('background', _bg)
-      .style('opacity', '0')
-      .style('width', '0px')
-      // .order()
-      .transition()
-      .duration(0)
-      .each('end', function() { links.order(); })
-      .transition()
-      .duration(1000)
-      .style('opacity', '1.0')
-      .style('width', '70px')
+      .call(_show);
 
-    // links.order();
   }
 
   // Implments fetching in this module
