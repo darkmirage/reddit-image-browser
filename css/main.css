@@ -10,7 +10,7 @@ body, div, ul, h1, h2 {
   font-size: 100%;
 }
 
-#ribcage ol, #ribcage ul {
+ol, ul {
   list-style: none;
 }
 
@@ -24,6 +24,8 @@ body {
   text-align: center;
 }
 
+/* Header */
+
 #header {
   background: #252525;
   text-align: center;
@@ -31,6 +33,7 @@ body {
 
 #header .content {
   width: 900px;
+  height: 40px;
   margin: 0 auto;
   overflow: hidden;
 }
@@ -43,21 +46,62 @@ body {
   font-size: 1.5em;
 }
 
-#ribcage {
-  overflow: hidden;
-  margin: auto;
-  text-align: left;
-  width: 900px;
+#header h2 {
+  margin-top: 10px;
+  color: #aaa;
+  float: left;
+  font-size: 0.8em;
 }
 
-#ribcage a {
+#header h2 span {
   color: #fff;
-  text-decoration: none;
+}
+
+#header .nav {
+  display: block;
+  float: right;
+  height: 100%;
+}
+
+.drawer-handle {
+  position: relative;
+  top: 10px;
+  padding: 5px 10px;
+  z-index: 1;
+  background: #eee;
+  color: #333;
+  text-align: center;
+  margin-left: 40px;
+  font-weight: bold;
+  text-transform: lowercase;
+  border-radius: 5px;
+}
+
+.drawer-handle:hover {
+  background: #333;
+  color: #eee;
+}
+
+/* Side Menu */
+
+.side {
+  position: absolute;
+  z-index: 2;
+  overflow-y: auto;
+  background: #fff;
+  right: -310px;
+  top: 0;
+  padding: 10px;
+  padding-right: 20px;
+  width: 300px;
+  max-height: 100%;
+  min-height: 200px;
+  margin: 0 !important;
+  border-radius: 10px;
 }
 
 #subreddits {
   clear: both;
-  padding: 10px;
 }
 
 #subreddits li {
@@ -76,38 +120,30 @@ body {
   background: #333;
 }
 
-#ribcage .drawer-toggle {
-  position: relative;
-  top: 30px;
-  padding: 5px 10px;
-  z-index: 2;
-  background: #eee;
-  color: #333;
-  text-align: center;
-  margin-left: 40px;
-  font-weight: bold;
-  text-transform: lowercase;
-  border-radius: 5px;
+#subreddits .active {
+  background: #000;
 }
 
-.active {
-  background: #333 !important;
-  color: #fff !important;
+/* Body */
+
+#ribcage {
+  overflow: hidden;
+  margin: auto;
+  text-align: left;
+  width: 900px;
 }
 
-.active:after {
-  content: " \25B2";
-}
-
-.inactive:after {
-  content: " \25BC";
+a {
+  color: #fff;
+  text-decoration: none;
 }
 
 #links {
-  overflow-x: scroll;
+  overflow: hidden;
   clear: both;
-  padding: 10px;
   white-space: nowrap;
+  width: 100%;
+  height: 82px;
 }
 
 #links span:hover {
@@ -147,7 +183,6 @@ body {
 .box {
   background: #fff;
   overflow: hidden;
-  padding: 10px !important;
 }
 
 .shadow {
@@ -175,7 +210,7 @@ html, body {
 #footer {
   background: #252525;
   position: relative;
-  margin-top: -50px;
+  margin-top: -40px;
   clear: both;
-  height: 50px;
+  height: 40px;
 }

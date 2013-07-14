@@ -16,15 +16,22 @@
     <div id="header">
       <div class="content">
         <h1>Reddit Image Browser</h1>
+        <h2>by <span><a href="http://www.soraven.com/contact">Raven</a></span></h2>
+
+        <div class="nav">
+          <a href="#" class="drawer-handle shadow" name='subreddits'>Subs</a>
+        </div>
       </div>
+    </div>
+
+    <div class="side shadow">
+      <ul id="subreddits"></ul>
     </div>
 
     <div id="container">
 
       <div id="ribcage">
-        <a href="#" class="drawer-toggle shadow active" name='subreddits'></a>
         <div class="shadow box">
-          <ul id="subreddits"></ul>
           <div id="links"></div>
         </div>
 
@@ -37,7 +44,7 @@
 
   <div id="footer"><div>
 
-  <script src="lib/jquery-2.0.3.js" type="text/javascript"></script>
+  <script src="lib/jquery-2.0.3.min.js" type="text/javascript"></script>
   <script src="lib/underscore.js" type="text/javascript"></script>
   <script src="lib/d3.v3.min.js" type="text/javascript"></script>
   <script src="js/rib.js" type="text/javascript"></script>

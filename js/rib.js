@@ -47,7 +47,7 @@ templates.user = '<div>' +
 templates.link = '<a href="http://www.reddit.com<%= item.permalink %>"><h2><%= item.title %></h2></a>';
 
 templates.subreddit = '<li>' +
-                     '<a href="<%= item.url %>" name="<%= item.name %>">' +
+                     '<a href="#" name="<%= item.display_name %>">' +
                      '<%= item.display_name %>' +
                      '</a>' +
                      '</li>';
@@ -113,8 +113,10 @@ function RedditImageBrowser(config) {
   }
 
   // Implments fetching in this module
-  rib.fetch = function(args) {
-    fetcher(args, rib.parse);
+  rib.fetch = function(args, callback) {
+    if (callback === undefined)
+      callback = rib.parse;
+    fetcher(args, callback);
   }
 
   rib.add = function(subreddit) {
@@ -125,17 +127,44 @@ function RedditImageBrowser(config) {
     rib.main.remove(subreddit);
   }
 
-  // Subreddit selection
-  var container = $(rib.config.sub_id);
-  rib.subreddits = new ItemList(container, templates.subreddit);
-  var toggle = $('a[name=subreddits]');
-  toggle.click(function(e) {
-    container.slideToggle({ duration: 400 });
-    toggle.toggleClass('active inactive');
-  });
+  rib.init = function() {
+    // Subreddit selection
+    var container = $(rib.config.sub_id);
+    console.debug(container);
+    rib.subreddits = new ItemList(container, templates.subreddit);
+    var handle = $('a[name=subreddits]');
 
-  // Initialize main view
-  rib.main = new MainView(rib.config.defaults, rib.cage);
+    var parent = container.parent();
+    handle.hover(function() {
+      parent.stop(true, false).animate({'right': '-10px'}, 900);
+    }, function() {
+    });
+    parent.hover(function() {}, function() {
+      parent.animate({'right': '-310px'}, 800);
+    });
+
+    // Initialize main view
+    rib.main = new MainView(rib.config.defaults, rib.cage);
+
+    // Fetch subreddit selections
+    rib.fetch({ type: 'subreddits', name: 'popular' }, function(json) {
+      rib.parse(json);
+
+      // Initialize default selection of subs
+      for (var i = 0; i < rib.main.subs.length; i++) {
+        $('a[name=' + rib.main.subs[i] + ']').addClass('active');
+      }
+
+      container.find('a').on('click', function() {
+        // console.debug(this);
+        if ($(this).hasClass('active'))
+          rib.remove($(this).attr('name'));
+        else
+          rib.add($(this).attr('name'));
+        $(this).toggleClass('active');
+      });
+    });
+  }
 }
 
 // Item parsing and rendering for the main links
@@ -146,6 +175,7 @@ function MainView(subs, parent) {
   this.subs = subs.slice(0);
   this.links = [];
   var after = null;
+  var limit = 30;
 
   // Display
   var template = _.template(templates.link);
@@ -165,6 +195,7 @@ function MainView(subs, parent) {
 
   this.add = function(entry) {
     that.subs.push(entry);
+    limit += 10;
     that.reset();
   }
 
@@ -177,18 +208,19 @@ function MainView(subs, parent) {
 
   this.more = function() {
     var name = that.subs.join('+');
-    params = {};
-    params.type = 'r';
-    params.name = name;
+    args = {};
+    args.type = 'r';
+    args.name = name;
     if (after != null)
-      params.after = after;
+      args.after = after;
 
-    that.fetch(params, that.parse);
+    that.fetch(args, that.parse);
   }
 
   this.reset = function() {
     that.links = [];
     after = null;
+    limit = 30;
     that.more();
   }
 
@@ -214,18 +246,42 @@ function MainView(subs, parent) {
   // Basic rendering with no paging
   this.render = function() {
     var _bg = function(d) {
-      if (d.data.thumbnail == '')
+      if (d.data.thumbnail == '' || d.data.thumbnail == 'nsfw')
         return '#eee';
       else
         return '#eee url(' + d.data.thumbnail + ') no-repeat center';
     }
-    content.selectAll('span')
-      .data(that.links, function(d) { return d.data.name; })
-      .enter().append('span')
-      .style('background', _bg)
-      .attr('class', 'thumbnail')
+    var links = content.selectAll('span')
+      .data(that.links, function(d) { return d.data.name; });
+
+    links.exit()
+      .transition()
+      .duration(1000)
+      .style('width', '0px')
+      .style('margin-left', '0px')
+      .style('margin-right', '0px')
+      .style('opacity', '0')
+      .each('end', function() { links.order(); })
+      .remove();
+
+    links.enter()
+      .append('span')
       .html(function(d) { return template({ item: d.data }); })
-      .on('click', that.display);
+      .on('click', that.display)
+      .attr('class', 'thumbnail')
+      .style('background', _bg)
+      .style('opacity', '0')
+      .style('width', '0px')
+      // .order()
+      .transition()
+      .duration(0)
+      .each('end', function() { links.order(); })
+      .transition()
+      .duration(1000)
+      .style('opacity', '1.0')
+      .style('width', '70px')
+
+    // links.order();
   }
 
   // Implments fetching in this module
@@ -260,9 +316,10 @@ $(document).ready(function() {
 
   window.rib = new RedditImageBrowser();
   // rib.fetch({ type: 'hot', limit: 4, after: 'test' });
-  rib.fetch({ type: 'subreddits', name: 'popular' });
+
+  rib.init();
   // rib.fetch({type: 'user', name: 'DarkMirage'});
   setTimeout(function() {
     $('a[name=subreddits]').trigger('click');
-  }, 2000);
+  }, 0);
 });
