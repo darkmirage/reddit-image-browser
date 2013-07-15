@@ -289,13 +289,12 @@ function MainView(subs, parent) {
       .attr('data-index', function(d, i) { return i; })
       .call(that.helpers.show);
 
-    that.helpers.enableNavigation();
+    that.helpers.enableLinks();
   }
 
   this.select = function(index) {
     container.find('.thumbnail').removeClass('selected');
     var elem = $('span[data-index=' + index + ']');
-    console.debug(elem);
     elem.addClass('selected');
     selected = elem;
 
@@ -349,6 +348,7 @@ function MainView(subs, parent) {
     },
     selectNext: function() {
       var index = parseInt(selected.attr('data-index')) + 1;
+      console.debug(index);
       if (index < that.links.length) {
         that.select(index);
       }
@@ -358,6 +358,7 @@ function MainView(subs, parent) {
     },
     selectPrev: function() {
       var index = parseInt(selected.attr('data-index')) - 1;
+      console.debug(index);
       if (index >= 0) {
         that.select(index);
       }
@@ -373,7 +374,7 @@ function MainView(subs, parent) {
         that.helpers.scroll(10);
       }, function() { scrolling = false });
     },
-    enableNavigation: function() {
+    enableLinks: function() {
       var links = container.find('.thumbnail');
       links.hover(function() {
         $(this).addClass('hover');
@@ -383,8 +384,18 @@ function MainView(subs, parent) {
       links.click(function() {
         that.select($(this).attr('data-index'));
       });
+    },
+    enableKeyboard: function() {
+      var lock = false;
+      var timer;
 
-      $(document).keypress(function(e) {
+      var keyHandler = function(e) {
+        if (lock) {
+          console.debug('lock');
+          return;
+        }
+        console.debug(e);
+        lock = true;
         switch (e.which) {
           case 106:
           case 74:
@@ -395,7 +406,10 @@ function MainView(subs, parent) {
             that.helpers.selectNext();
             break;
         }
-      });
+        timer = setTimeout(function() { lock = false; console.debug('unlock') }, 400);
+      }
+
+      $(document).on('keydown', keyHandler);
     },
     hide: function(selection) {
       selection
@@ -470,7 +484,7 @@ function MainView(subs, parent) {
     }
   }
 
-  // Implments fetching in this module
+  // Implements fetching in this module
   this.fetch = fetcher;
 
   this.helpers.enableScroll();
@@ -479,6 +493,8 @@ function MainView(subs, parent) {
   this.reset(function() {
     that.select(0);
   });
+
+  this.helpers.enableKeyboard();
 }
 
 // Generic item parsing and rendering
