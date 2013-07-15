@@ -219,6 +219,7 @@ function MainView(subs, parent) {
     args = {};
     args.type = 'r';
     args.name = name;
+    args.limit = 5;
     if (after != null)
       args.after = after;
 
@@ -271,6 +272,7 @@ function MainView(subs, parent) {
       .data(that.links, function(d) { return d.data.name; });
 
     update
+      .attr('data-index', function(d, i) { return i; })
       .transition()
       .duration(500)
       .style('left', function(d, i) { return (5 + i * 77) + 'px' });
@@ -293,6 +295,7 @@ function MainView(subs, parent) {
   this.select = function(index) {
     container.find('.thumbnail').removeClass('selected');
     var elem = $('span[data-index=' + index + ']');
+    console.debug(elem);
     elem.addClass('selected');
     selected = elem;
 
@@ -344,13 +347,16 @@ function MainView(subs, parent) {
         that.helpers.scroll(rate, i + 1);
       }, 10);
     },
-    scrollNext: function() {
+    selectNext: function() {
       var index = parseInt(selected.attr('data-index')) + 1;
       if (index < that.links.length) {
         that.select(index);
       }
+      if (index > that.links.length - 5) {
+        that.more();
+      }
     },
-    scrollPrev: function() {
+    selectPrev: function() {
       var index = parseInt(selected.attr('data-index')) - 1;
       if (index >= 0) {
         that.select(index);
@@ -382,11 +388,11 @@ function MainView(subs, parent) {
         switch (e.which) {
           case 106:
           case 74:
-            that.helpers.scrollPrev();
+            that.helpers.selectPrev();
             break;
           case 107:
           case 75:
-            that.helpers.scrollNext();
+            that.helpers.selectNext();
             break;
         }
       });
@@ -413,9 +419,11 @@ function MainView(subs, parent) {
     },
     preload: function(link) {
       if (link.type == 'image') {
+        var timeout;
         link.img = $('<img/>').attr('src', link.data.url);
         link.img.on('load', function() {
-          that.helpers.stopLoading();
+          clearTimeout(timeout);
+          timeout = setTimeout(that.helpers.stopLoading, 200);
         });
       }
     },
