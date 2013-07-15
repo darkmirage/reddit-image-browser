@@ -2,6 +2,7 @@
 
 body, div, ul, h1, h2 {
   box-sizing: border-box;
+  -moz-box-sizing: border-box;
   margin: 0;
   padding: 0;
   border: 0;
@@ -139,10 +140,10 @@ body {
 
 .scroll {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   width: 20px;
   height: 80px;
-  top: 20px;
+  top: 10px;
   cursor: pointer;
 }
 
@@ -205,14 +206,17 @@ a {
   border: 1px solid #555 !important;
 }
 
+/* Individual Post */
+
 #post {
   min-height: 200px;
   min-width: 200px;
   text-align: center;
+  position: relative;
 }
 
 #post img {
-  max-width: 840px;
+  max-width: 860px;
   display: block;
 }
 
@@ -232,12 +236,33 @@ a {
   overflow: hidden;
 }
 
+.pad {
+  margin: 10px 20px;
+}
+
 .shadow {
   overflow: hidden;
-  margin: 20px;
   -moz-box-shadow: 0px 0px 3px #aaa !important;
   -webkit-box-shadow: 0px 0px 3px #aaa !important;
   box-shadow: 0px 0px 3px #aaa !important;
+}
+
+/* Post Meta */
+
+#post-meta {
+  padding: 0 20px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+#post-meta h3 {
+  padding: 5px;
+  float: left;
+  width: 400px;
+  margin: 0;
+  font-size: 10px;
+  font-weight: normal;
 }
 
 /* Footer fix */

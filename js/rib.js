@@ -52,6 +52,8 @@ templates.subreddit = '<li>' +
                      '</a>' +
                      '</li>';
 
+templates.meta = '<h3 class="box shadow"><%= item.title %></h3>'
+
 // Main RIB class
 function RedditImageBrowser(config) {
   console.log('Initializing RIB');
@@ -175,10 +177,12 @@ function MainView(subs, parent) {
   var limit = 30;
 
   var template = _.template(templates.link);
+  var meta_template = _.template(templates.meta);
   var container = $('#links');
   this.container = container;
   var content = d3.select('#links');
   var curr = $('#post');
+  var meta = $('#post-meta');
 
   var scrolling = false;
   var loading = false;
@@ -224,6 +228,7 @@ function MainView(subs, parent) {
     that.links = [];
     after = null;
     limit = 30;
+    that.helpers.scrollHome();
     that.more();
   }
 
@@ -250,6 +255,7 @@ function MainView(subs, parent) {
 
     content.attr('id', d.name);
     content.append(elem);
+    meta.html(meta_template({ item: d }));
     old.remove();
     curr.append(content);
   }
@@ -287,6 +293,9 @@ function MainView(subs, parent) {
     stopLoading: function() {
       loading = false;
       $('#loading').fadeOut(400);
+    },
+    scrollHome: function() {
+      that.container.scrollLeft(0);
     },
     scroll: function(rate, i) {
       if (i === undefined)
