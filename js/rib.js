@@ -174,6 +174,7 @@ function MainView(subs, parent) {
 
   this.subs = subs.slice(0);
   this.links = [];
+  this.urls = [];
   var after = null;
   var limit = 30;
 
@@ -206,25 +207,29 @@ function MainView(subs, parent) {
   }
 
   // These operate on the retrieved links
-  this.parse = function(json) {
+  this.parse = function(json, url) {
     that.links = that.links.concat(json.data.children);
     after = that.links[that.links.length - 1].data.name;
     that.helpers.format();
     that.render();
+    that.helpers.stopLoading();
   }
 
   this.more = function(callback) {
-    that.helpers.startLoading();
+    if (loading)
+      return;
+    loading = true;
+    $('#loading').show();
+
     var name = that.subs.join('+');
     args = {};
     args.type = 'r';
     args.name = name;
-    args.limit = 5;
     if (after != null)
       args.after = after;
 
-    that.fetch(args, function(json) {
-      that.parse(json);
+    that.fetch(args, function(json, url) {
+      that.parse(json, url);
       if (callback !== undefined)
         callback(json);
     });
@@ -232,6 +237,7 @@ function MainView(subs, parent) {
 
   this.reset = function(callback) {
     that.links = [];
+    that.urls = [];
     after = null;
     limit = 30;
     that.helpers.scrollHome();
@@ -240,7 +246,6 @@ function MainView(subs, parent) {
 
   // Display the selected item
   this.display = function(link) {
-    // console.debug(link);
     d = link.data;
 
     var content = $('<div></div>').addClass('shadow');
@@ -273,8 +278,6 @@ function MainView(subs, parent) {
 
     update
       .attr('data-index', function(d, i) { return i; })
-      .transition()
-      .duration(500)
       .style('left', function(d, i) { return (5 + i * 77) + 'px' });
 
     update.exit()
@@ -348,7 +351,6 @@ function MainView(subs, parent) {
     },
     selectNext: function() {
       var index = parseInt(selected.attr('data-index')) + 1;
-      console.debug(index);
       if (index < that.links.length) {
         that.select(index);
       }
@@ -358,7 +360,6 @@ function MainView(subs, parent) {
     },
     selectPrev: function() {
       var index = parseInt(selected.attr('data-index')) - 1;
-      console.debug(index);
       if (index >= 0) {
         that.select(index);
       }
@@ -386,16 +387,9 @@ function MainView(subs, parent) {
       });
     },
     enableKeyboard: function() {
-      var lock = false;
-      var timer;
 
       var keyHandler = function(e) {
-        if (lock) {
-          console.debug('lock');
-          return;
-        }
         console.debug(e);
-        lock = true;
         switch (e.which) {
           case 106:
           case 74:
@@ -406,7 +400,6 @@ function MainView(subs, parent) {
             that.helpers.selectNext();
             break;
         }
-        timer = setTimeout(function() { lock = false; console.debug('unlock') }, 400);
       }
 
       $(document).on('keydown', keyHandler);
@@ -435,13 +428,10 @@ function MainView(subs, parent) {
       if (link.type == 'image') {
         var timeout;
         link.img = $('<img/>').attr('src', link.data.url);
-        link.img.on('load', function() {
-          clearTimeout(timeout);
-          timeout = setTimeout(that.helpers.stopLoading, 200);
-        });
       }
     },
     format: function() {
+      that.links = _.compact(that.links);
       for (var i = 0; i < that.links.length; i++) {
         var link = that.links[i];
         var d = link.data;
