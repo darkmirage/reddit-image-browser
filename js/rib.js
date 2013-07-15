@@ -41,8 +41,8 @@ function fetcher(args, callback) {
 // Underscore.js templates
 var templates = {};
 templates.user = '<div>' +
-                '<%= item.name %>' +
-                '</div>';
+                 '<%= item.name %>' +
+                 '</div>';
 
 templates.link = '<a href="http://www.reddit.com<%= item.permalink %>"><h2><%= item.title %></h2></a>';
 
@@ -130,7 +130,6 @@ function RedditImageBrowser(config) {
   rib.init = function() {
     // Subreddit selection
     var container = $(rib.config.sub_id);
-    console.debug(container);
     rib.subreddits = new ItemList(container, templates.subreddit);
     var handle = $('a[name=subreddits]');
 
@@ -156,7 +155,6 @@ function RedditImageBrowser(config) {
       }
 
       container.find('a').on('click', function() {
-        // console.debug(this);
         if ($(this).hasClass('active'))
           rib.remove($(this).attr('name'));
         else
@@ -171,17 +169,19 @@ function RedditImageBrowser(config) {
 function MainView(subs, parent) {
   var that = this;
 
-  // Data
   this.subs = subs.slice(0);
   this.links = [];
   var after = null;
   var limit = 30;
 
-  // Display
   var template = _.template(templates.link);
   var container = $('#links');
+  this.container = container;
   var content = d3.select('#links');
   var curr = $('#post');
+
+  var scrolling = false;
+  var loading = false;
 
   // These operate on the Subreddit list
   this.remove = function(entry) {
@@ -201,12 +201,15 @@ function MainView(subs, parent) {
 
   // These operate on the retrieved links
   this.parse = function(json) {
+    that.helpers.stopLoading();
     that.links = that.links.concat(json.data.children);
     after = that.links[that.links.length - 1].data.name;
+    that.helpers.format();
     that.render();
   }
 
   this.more = function() {
+    that.helpers.startLoading();
     var name = that.subs.join('+');
     args = {};
     args.type = 'r';
@@ -224,35 +227,104 @@ function MainView(subs, parent) {
     that.more();
   }
 
-  this.display = function(d) {
-    p = d.data;
-    // curr.html('');
-    var content = '<div class="shadow">';
-    if (p.thumbnail != '') {
-      var format = p.url.substr(p.url.length - 3, 3);
-      if (_.indexOf(['png', 'jpg', 'gif'], format) != -1) {
-        content += '<img src="' + p.url + '" />';
-      } else if (p.url.indexOf('imgur.com') != -1) {
-        content += '<img src="' + p.url + '.jpg" />';
-      }
+  // Display the selected item
+  this.display = function(link) {
+    // console.debug(link);
+    d = link.data;
+
+    var content = $('<div></div>').addClass('shadow');
+    var old = curr.find('.shadow');
+
+
+    if (link.type == 'image') {
+      var elem = link.img;
     }
-    content += '</div>';
-    curr.fadeOut(100, function() {
-      curr.html(content);
-    });
-    curr.fadeIn(100);
+    else if (link.type == 'album') {
+      var elem = $('<iframe></iframe>');
+      elem
+        .addClass('imgur-album')
+        .attr('frameborder', 0)
+        .attr('src', link.data.url + '/embed');
+      link.iframe = elem;
+    }
+
+    content.attr('id', d.name);
+    content.append(elem);
+    old.remove();
+    curr.append(content);
   }
 
-  // Basic rendering with no paging
+  // Basic rendering of thumbnails with no paging
   this.render = function() {
-    var _bg = function(d) {
-      if (d.data.thumbnail == '' || d.data.thumbnail == 'nsfw')
-        return '#eee';
-      else
-        return '#eee url(' + d.data.thumbnail + ') no-repeat center';
-    }
+    var update = content.selectAll('span')
+      .data(that.links, function(d) { return d.data.name; });
 
-    var _hide = function(selection) {
+    update
+      .transition()
+      .duration(500)
+      .style('left', function(d, i) { return (5 + i * 77) + 'px' });
+
+    update.exit()
+      .call(that.helpers.hide);
+
+    update.enter()
+      .append('span')
+      .style('left', function(d, i) { return (5 + i * 77) + 'px' })
+      .html(function(d) { return template({ item: d.data }); })
+      .on('click', that.display)
+      .attr('class', 'thumbnail')
+      .call(that.helpers.show);
+
+    that.helpers.effects();
+  }
+
+  // Helper functions
+  this.helpers = {
+    startLoading: function() {
+      loading = true;
+      $('#loading').show();
+    },
+    stopLoading: function() {
+      loading = false;
+      $('#loading').fadeOut(400);
+    },
+    scroll: function(rate, i) {
+      if (i === undefined)
+        i = 0;
+
+      if (!scrolling && i >= 0)
+        return;
+
+      var x = that.container.scrollLeft();
+      that.container.scrollLeft(container.scrollLeft() + rate);
+
+      if (x == that.container.scrollLeft() && !loading) {
+        that.more();
+      }
+
+      // rate = i >= 200 && i < 300 ? rate * 1.02 : rate;
+
+      // console.debug(that.container.scrollLeft());
+
+      if (i < 0)
+        return;
+
+      setTimeout(function() {
+        that.helpers.scroll(rate, i + 1);
+      }, 10);
+    },
+    enableScroll: function() {
+      $('#scroll-left').hover(function() {
+        scrolling = true;
+        that.helpers.scroll(-10);
+
+      }, function() { scrolling = false; });
+      $('#scroll-right').hover(function() {
+        scrolling = true;
+        that.helpers.scroll(10);
+      }, function() { scrolling = false });
+    },
+    hide: function(selection) {
       selection
         .transition()
         .duration(500)
@@ -261,43 +333,80 @@ function MainView(subs, parent) {
         .style('margin-right', '0px')
         .style('opacity', '0')
         .remove();
-    }
-
-    var _show = function(selection) {
-      console.debug('show');
+    },
+    show: function(selection) {
       selection
-        .style('background', _bg)
+        .style('background', function(d) { return '#eee url(' + d.data.thumbnail + ') no-repeat center'; })
         .style('opacity', '0')
         .style('width', '0px')
         .transition()
         .duration(500)
         .style('opacity', '1.0')
         .style('width', '70px')
+    },
+    effects: function() {
+      var links = container.find('.thumbnail');
+      links.hover(function() {
+        $(this).addClass('hover');
+      }, function() {
+        $(this).removeClass('hover');
+      });
+      links.click(function() {
+        links.removeClass('selected');
+        $(this).addClass('selected');
+      });
+    },
+    preload: function(link) {
+      if (link.type == 'image')
+        link.img = $('<img/>').attr('src', link.data.url);
+    },
+    format: function() {
+      for (var i = 0; i < that.links.length; i++) {
+        var link = that.links[i];
+        var d = link.data;
+        var type = d.url.substr(d.url.length - 3, 3);
+
+        if (_.indexOf(['png', 'jpg', 'gif'], type) != -1) {
+          link.type = 'image';
+        }
+        else if (d.url.indexOf('imgur.com/a/') != -1) {
+          link.type = 'album';
+        }
+        else if (d.url.indexOf('imgur.com/gallery/') != -1) {
+          d.url = d.url.replace(/\/new$/, '');
+          d.url = d.url.replace('imgur.com/gallery/', 'imgur.com/') + '.jpg';
+          link.type = 'image';
+        }
+        else if (d.url.indexOf('imgur.com') != -1) {
+          d.url += '.jpg';
+          link.type = 'image';
+        }
+
+        that.helpers.preload(link);
+
+        if (d.thumbnail == '') {
+          d.thumbnail = './img/nothumb.png';
+          link.type = 'page';
+        }
+
+        if (d.thumbnail == 'self') {
+          d.thumbnail = './img/self.png';
+          link.type = 'page';
+        }
+
+        if (d.thumbnail == 'nsfw') {
+          d.thumbnail = './img/nsfw.png';
+          link.type = 'page';
+        }
+
+      }
     }
-
-    var links = content.selectAll('span')
-      .data(that.links, function(d) { return d.data.name; });
-
-    links
-      .transition()
-      .duration(500)
-      .style('left', function(d, i) { return (5 + i * 75) + 'px' });
-
-    links.exit()
-      .call(_hide);
-
-    links.enter()
-      .append('span')
-      .style('left', function(d, i) { return (5 + i * 75) + 'px' })
-      .html(function(d) { return template({ item: d.data }); })
-      .on('click', that.display)
-      .attr('class', 'thumbnail')
-      .call(_show);
-
   }
 
   // Implments fetching in this module
   this.fetch = fetcher;
+
+  this.helpers.enableScroll();
 
   // Fetch initial links
   this.reset();

@@ -126,7 +126,38 @@ body {
 
 /* Body */
 
+#loading {
+  position: absolute;
+  z-index: 4;
+  top: 5px;
+  right: 20px;
+  width: 100px;
+  height: 10px;
+  text-transform: lowercase;
+  font-size: 10px;
+}
+
+.scroll {
+  position: absolute;
+  z-index: 2;
+  width: 20px;
+  height: 80px;
+  top: 20px;
+  cursor: pointer;
+}
+
+#scroll-left {
+  left: 0;
+  background: url('../img/left.png') no-repeat left center;
+}
+
+#scroll-right {
+  right: 0;
+  background: url('../img/right.png') no-repeat right center;
+}
+
 #ribcage {
+  position: relative;
   overflow: hidden;
   margin: auto;
   text-align: left;
@@ -144,7 +175,7 @@ a {
   clear: both;
   white-space: nowrap;
   width: 100%;
-  height: 80px;
+  height: 82px;
   padding: 5px;
 }
 
@@ -159,10 +190,19 @@ a {
   left: 0;
   width: 70px;
   height: 70px;
+  border: 1px solid #fff;
 }
 
 .thumbnail h2 {
   display: none;
+}
+
+#links .hover {
+  border: 1px solid #3a87ad;
+}
+
+#links .selected {
+  border: 1px solid #555 !important;
 }
 
 #post {
@@ -180,7 +220,11 @@ a {
   position: relative;
   margin: 0 auto;
   display: inline-block;
-  background: #fff;
+}
+
+#post iframe {
+  width: 860px;
+  height: 600px;
 }
 
 .box {
@@ -189,10 +233,11 @@ a {
 }
 
 .shadow {
+  overflow: hidden;
   margin: 20px;
-  -moz-box-shadow: 0px 0px 3px #aaa;
-  -webkit-box-shadow: 0px 0px 3px #aaa;
-  box-shadow: 0px 0px 3px #aaa;
+  -moz-box-shadow: 0px 0px 3px #aaa !important;
+  -webkit-box-shadow: 0px 0px 3px #aaa !important;
+  box-shadow: 0px 0px 3px #aaa !important;
 }
 
 /* Footer fix */
