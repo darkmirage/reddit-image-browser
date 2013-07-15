@@ -129,13 +129,19 @@ body {
 
 #loading {
   position: absolute;
+  background: #333;
+  color: #fff;
   z-index: 4;
   top: 5px;
   right: 20px;
-  width: 100px;
-  height: 10px;
+  padding: 5px;
   text-transform: lowercase;
-  font-size: 10px;
+  font-size: 12px;
+}
+
+#loading span {
+  padding-right: 25px;
+  background: url('../img/loading-small.gif') no-repeat right center;
 }
 
 .scroll {

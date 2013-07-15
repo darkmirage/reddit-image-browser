@@ -52,7 +52,8 @@ templates.subreddit = '<li>' +
                      '</a>' +
                      '</li>';
 
-templates.meta = '<h3 class="box shadow"><%= item.title %></h3>'
+templates.meta = '<h3 class="box shadow"><%= item.title %></h3>' +
+                 '<div class="box shadow"></div>'
 
 // Main RIB class
 function RedditImageBrowser(config) {
@@ -63,7 +64,7 @@ function RedditImageBrowser(config) {
   rib.config = {};
   rib.config.cage_id = '#ribcage';
   rib.config.sub_id = '#subreddits';
-  rib.config.defaults = ['pics', 'AskReddit'];
+  rib.config.defaults = ['pics'];
 
   // Configuration parser
   rib.set = function(config) {
@@ -186,6 +187,7 @@ function MainView(subs, parent) {
 
   var scrolling = false;
   var loading = false;
+  var selected = null;
 
   // These operate on the Subreddit list
   this.remove = function(entry) {
@@ -205,14 +207,13 @@ function MainView(subs, parent) {
 
   // These operate on the retrieved links
   this.parse = function(json) {
-    that.helpers.stopLoading();
     that.links = that.links.concat(json.data.children);
     after = that.links[that.links.length - 1].data.name;
     that.helpers.format();
     that.render();
   }
 
-  this.more = function() {
+  this.more = function(callback) {
     that.helpers.startLoading();
     var name = that.subs.join('+');
     args = {};
@@ -221,15 +222,19 @@ function MainView(subs, parent) {
     if (after != null)
       args.after = after;
 
-    that.fetch(args, that.parse);
+    that.fetch(args, function(json) {
+      that.parse(json);
+      if (callback !== undefined)
+        callback(json);
+    });
   }
 
-  this.reset = function() {
+  this.reset = function(callback) {
     that.links = [];
     after = null;
     limit = 30;
     that.helpers.scrollHome();
-    that.more();
+    that.more(callback);
   }
 
   // Display the selected item
@@ -277,11 +282,22 @@ function MainView(subs, parent) {
       .append('span')
       .style('left', function(d, i) { return (5 + i * 77) + 'px' })
       .html(function(d) { return template({ item: d.data }); })
-      .on('click', that.display)
       .attr('class', 'thumbnail')
+      .attr('data-name', function(d, i) { return d.data.name; })
+      .attr('data-index', function(d, i) { return i; })
       .call(that.helpers.show);
 
-    that.helpers.effects();
+    that.helpers.enableNavigation();
+  }
+
+  this.select = function(index) {
+    container.find('.thumbnail').removeClass('selected');
+    var elem = $('span[data-index=' + index + ']');
+    elem.addClass('selected');
+    selected = elem;
+
+    // Kind of hacky? Couldn't get d3 selects to work for [data-index=]
+    that.display(elem[0].__data__);
   }
 
   // Helper functions
@@ -292,10 +308,11 @@ function MainView(subs, parent) {
     },
     stopLoading: function() {
       loading = false;
-      $('#loading').fadeOut(400);
+      $('#loading').fadeOut(1000);
     },
     scrollHome: function() {
       that.container.scrollLeft(0);
+      $('#scroll-left').hide();
     },
     scroll: function(rate, i) {
       if (i === undefined)
@@ -306,6 +323,11 @@ function MainView(subs, parent) {
 
       var x = that.container.scrollLeft();
       that.container.scrollLeft(container.scrollLeft() + rate);
+
+      if (x == 0)
+        $('#scroll-left').hide();
+      else
+        $('#scroll-left').show();
 
       if (x == that.container.scrollLeft() && !loading) {
         that.more();
@@ -322,6 +344,18 @@ function MainView(subs, parent) {
         that.helpers.scroll(rate, i + 1);
       }, 10);
     },
+    scrollNext: function() {
+      var index = parseInt(selected.attr('data-index')) + 1;
+      if (index < that.links.length) {
+        that.select(index);
+      }
+    },
+    scrollPrev: function() {
+      var index = parseInt(selected.attr('data-index')) - 1;
+      if (index >= 0) {
+        that.select(index);
+      }
+    },
     enableScroll: function() {
       $('#scroll-left').hover(function() {
         scrolling = true;
@@ -332,6 +366,30 @@ function MainView(subs, parent) {
         scrolling = true;
         that.helpers.scroll(10);
       }, function() { scrolling = false });
+    },
+    enableNavigation: function() {
+      var links = container.find('.thumbnail');
+      links.hover(function() {
+        $(this).addClass('hover');
+      }, function() {
+        $(this).removeClass('hover');
+      });
+      links.click(function() {
+        that.select($(this).attr('data-index'));
+      });
+
+      $(document).keypress(function(e) {
+        switch (e.which) {
+          case 106:
+          case 74:
+            that.helpers.scrollPrev();
+            break;
+          case 107:
+          case 75:
+            that.helpers.scrollNext();
+            break;
+        }
+      });
     },
     hide: function(selection) {
       selection
@@ -353,21 +411,13 @@ function MainView(subs, parent) {
         .style('opacity', '1.0')
         .style('width', '70px')
     },
-    effects: function() {
-      var links = container.find('.thumbnail');
-      links.hover(function() {
-        $(this).addClass('hover');
-      }, function() {
-        $(this).removeClass('hover');
-      });
-      links.click(function() {
-        links.removeClass('selected');
-        $(this).addClass('selected');
-      });
-    },
     preload: function(link) {
-      if (link.type == 'image')
+      if (link.type == 'image') {
         link.img = $('<img/>').attr('src', link.data.url);
+        link.img.on('load', function() {
+          that.helpers.stopLoading();
+        });
+      }
     },
     format: function() {
       for (var i = 0; i < that.links.length; i++) {
@@ -418,7 +468,9 @@ function MainView(subs, parent) {
   this.helpers.enableScroll();
 
   // Fetch initial links
-  this.reset();
+  this.reset(function() {
+    that.select(0);
+  });
 }
 
 // Generic item parsing and rendering
