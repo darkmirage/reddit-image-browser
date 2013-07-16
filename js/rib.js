@@ -88,6 +88,7 @@ function RedditImageBrowser(config) {
     var type_prefix = json.data.after.substr(0, 2);
     var list = json.data.children;
 
+    // On hindsight, I did not need to make a general parser...
     switch (type_prefix) {
       case 't1':
         // Comment
@@ -212,14 +213,15 @@ function MainView(subs, parent) {
     after = that.links[that.links.length - 1].data.name;
     that.helpers.format();
     that.render();
-    that.helpers.stopLoading();
+    loading = false;
+    that.helpers.hideLoading();
   }
 
   this.more = function(callback) {
     if (loading)
       return;
     loading = true;
-    $('#loading').show();
+    that.helpers.showLoading();
 
     var name = that.subs.join('+');
     args = {};
@@ -307,13 +309,21 @@ function MainView(subs, parent) {
 
   // Helper functions
   this.helpers = {
-    startLoading: function() {
-      loading = true;
-      $('#loading').show();
+    loadCounts: { bar: 0 },
+    showLoading: function(type, count) {
+      if (type === undefined)
+        type = 'bar';
+      if (count === undefined)
+        count = 1;
+      that.helpers.loadCounts[type] += count;
+      $('#loading').fadeIn(200);
     },
-    stopLoading: function() {
-      loading = false;
-      $('#loading').fadeOut(1000);
+    hideLoading: function(type) {
+      if (type === undefined)
+        type = 'bar';
+      that.helpers.loadCounts[type] -= 1;
+      if (that.helpers.loadCounts[type] < 1)
+        $('#loading').fadeOut(500);
     },
     scrollHome: function() {
       that.container.scrollLeft(0);
@@ -329,22 +339,25 @@ function MainView(subs, parent) {
       var x = that.container.scrollLeft();
       that.container.scrollLeft(container.scrollLeft() + rate);
 
-      if (x == 0)
+      if (that.container.scrollLeft() == 0) {
         $('#scroll-left').hide();
-      else
+        return;
+      } else {
         $('#scroll-left').show();
+      }
 
       if (x == that.container.scrollLeft() && !loading) {
         that.more();
       }
 
+      // Someday I'll figure out how to put an ease function into this...
       // rate = i >= 200 && i < 300 ? rate * 1.02 : rate;
-
       // console.debug(that.container.scrollLeft());
 
+      // Set i to negative for a one-off scroll job!
       if (i < 0)
         return;
-
+      // Continuously scroll otherwise
       setTimeout(function() {
         that.helpers.scroll(rate, i + 1);
       }, 10);
@@ -389,7 +402,6 @@ function MainView(subs, parent) {
     enableKeyboard: function() {
 
       var keyHandler = function(e) {
-        console.debug(e);
         switch (e.which) {
           case 106:
           case 74:
@@ -426,8 +438,14 @@ function MainView(subs, parent) {
     },
     preload: function(link) {
       if (link.type == 'image') {
-        var timeout;
+        var timer;
         link.img = $('<img/>').attr('src', link.data.url);
+        link.thumb = $('<img/>').attr('src', link.data.thumbnail);
+
+        that.helpers.showLoading('bar');
+        link.thumb.on('load', function() {
+          that.helpers.hideLoading('bar');
+        });
       }
     },
     format: function() {
@@ -453,23 +471,26 @@ function MainView(subs, parent) {
           link.type = 'image';
         }
 
-        that.helpers.preload(link);
-
         if (d.thumbnail == '') {
           d.thumbnail = './img/nothumb.png';
-          link.type = 'page';
         }
-
-        if (d.thumbnail == 'self') {
+        else if (d.thumbnail == 'default') {
+          d.thumbnail = './img/nothumb.png';
+        }
+        else if (d.thumbnail == 'self') {
           d.thumbnail = './img/self.png';
-          link.type = 'page';
+          link.type = 'self';
         }
-
-        if (d.thumbnail == 'nsfw') {
+        else if (d.thumbnail == 'nsfw') {
           d.thumbnail = './img/nsfw.png';
+        }
+
+        if (link.type === undefined) {
           link.type = 'page';
         }
 
+        // preload images
+        that.helpers.preload(link);
       }
     }
   }
