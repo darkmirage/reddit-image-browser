@@ -70,13 +70,13 @@ h1, h2, h3 {
 
 .drawer-handle {
   position: relative;
-  top: 10px;
+  top: 11px;
   padding: 5px 10px;
   z-index: 1;
   background: #eee;
   color: #333;
+  margin-left: 5px;
   text-align: center;
-  margin-left: 40px;
   font-weight: bold;
   text-transform: lowercase;
   border-radius: 5px;
@@ -253,6 +253,7 @@ a {
   background: #fff;
   text-align: left;
   line-height: 25px;
+  overflow: auto;
 }
 
 #post .self-post a {
@@ -340,15 +341,53 @@ html, body {
   min-height: 100%;
 }
 
-#container {
-  overflow: auto;
-  padding-bottom: 80px;
-}
-
 #footer {
+  display: none;
   background: #252525;
   position: relative;
   margin-top: -40px;
   clear: both;
   height: 40px;
+}
+
+/* Guide */
+
+#guide {
+  color: #fff;
+  display: none;
+  top: 200px;
+  position: absolute;
+  z-index: 10;
+  max-width: 600px;
+  min-height: 300px;
+  background: #252525;
+  opacity: 0.95;
+  padding: 30px;
+  -moz-box-shadow: 0px 0px 5px #333 !important;
+  -webkit-box-shadow: 0px 0px 5px #333 !important;
+  box-shadow: 0px 0px 5px #333 !important;
+  border-radius: 5px;
+}
+
+#guide h2 {
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+#guide span {
+  display: inline-block;
+  min-width: 150px;
+}
+
+#guide em {
+  text-align: center;
+  font-weight: bold;
+  padding: 3px;
+  background: #eee;
+  color: #252525;
+  display: inline-block;
+  font-style: normal;
+  margin: 3px;
+  min-width: 20px;
+  border-radius: 2px;
 }

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>RIB</title>
+  <title>Reddit Image Browser</title>
 
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
@@ -19,7 +19,8 @@
         <h2>by <span><a href="http://www.soraven.com/contact">Raven</a></span></h2>
 
         <div class="nav">
-          <a href="#" class="drawer-handle shadow" name='subreddits'>Subs</a>
+          <a href="#" class="drawer-handle shadow" data-name='guide'>Help</a>
+          <a href="#" class="drawer-handle shadow" data-name='subreddits'>Subs</a>
         </div>
       </div>
     </div>
@@ -47,7 +48,15 @@
 
   </div>
 
-  <div id="footer"><div>
+  <div id="footer"></div>
+
+  <div id="guide">
+    <h2>Keyboard Shortcuts</h2>
+    <ul>
+      <li><span><em>j</em></span> go to previous post</li>
+      <li><span><em>k</em><em>k</em></span> go to next post</li>
+    </ul>
+  </div>
 
   <script src="lib/jquery-2.0.3.min.js" type="text/javascript"></script>
   <script src="lib/underscore.js" type="text/javascript"></script>
@@ -80,7 +89,7 @@
 </script>
 
 <script type="text/template" id="template-self">
-<div class="self-text">
+<div class="self-text post-content">
   <%= item.selftext %>
   <a href="http://www.reddit.com/user/<%= item.author %>">&mdash; <%= item.author %></a>
 </div>

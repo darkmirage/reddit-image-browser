@@ -128,19 +128,36 @@ function RedditImageBrowser(config) {
     // Subreddit selection
     var container = $(rib.config.sub_id);
     rib.subreddits = new ItemList(container, templates.subreddit);
-    var handle = $('a[name=subreddits]');
-
-    var parent = container.parent();
-    handle.hover(function() {
-      parent.stop(true, false).animate({'right': '-10px'}, 900);
-    }, function() {
-    });
-    parent.hover(function() {}, function() {
-      parent.animate({'right': '-310px'}, 800);
-    });
-
     // Initialize main view
     rib.main = new MainView(rib.config.defaults, rib.cage);
+
+
+    var enableSub = function(handle) {
+      var parent = $(rib.config.sub_id).parent();
+      handle.hover(function() {
+        parent.stop(true, false).animate({'right': '-10px'}, 900);
+      }, function() {
+      });
+      parent.hover(function() {}, function() {
+        parent.animate({'right': '-310px'}, 800);
+      });
+    }
+
+    var enableGuide = function(handle) {
+      var guide = $('#guide');
+      handle.hover(function() {
+        var left = ($(window).width() - guide.width()) / 2;
+        guide.css('left', left + 'px');
+        guide.fadeIn(0);
+        rib.cage.hide();
+      }, function() {
+        guide.fadeOut(0);
+        rib.cage.show();
+      });
+    }
+
+    enableSub($('a[data-name=subreddits]'));
+    enableGuide($('a[data-name=guide]'));
 
     // Fetch subreddit selections
     rib.fetch({ type: 'subreddits', name: 'popular' }, function(json) {
@@ -267,6 +284,7 @@ function MainView(subs, parent) {
     meta.html(templates.meta({ item: link.data }));
 
     curr.append(content);
+    this.resize(false);
   }
 
   // Basic rendering of thumbnails with no paging
@@ -349,15 +367,31 @@ function MainView(subs, parent) {
     }
   }
 
-  this.resize = function() {
-    var cur = $('#post .post-content');
-    var height = 0;
-    height += $('#header').height();
-    height += $('#links').height();
-    height += $('#footer').height();
-    height += $('#post-meta').height();
-    height = $(window).height() - height - 100;
-    cur.height(height);
+  var resizeTimer;
+  this.resize = function(animate) {
+    var doResize = function() {
+      var cur = $('#post .post-content');
+      var height = 0;
+      height += $('#header').height();
+      height += $('#links').height();
+      // height += $('#footer').height();
+      height += $('#post-meta').height();
+      // Kind of hacky since I'm accounting for margins manually
+      height = $(window).height() - height - 80;
+
+      cur.css('max-height', cur.height() + 'px');
+      if (animate)
+        cur.animate({ 'max-height': height + 'px'}, 500);
+      else
+        cur.css('max-height', height + 'px');
+    }
+
+    if (animate) {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(doResize, 200);
+    } else {
+      doResize();
+    }
   }
 
   // Helper functions
@@ -431,7 +465,7 @@ function MainView(subs, parent) {
       }
     },
     enableResize: function() {
-
+      $(window).resize(function() { that.resize(true); });
     },
     enableScroll: function() {
       $('#scroll-left').hover(function() {
@@ -512,7 +546,7 @@ function MainView(subs, parent) {
   this.helpers.enableScroll();
 
   // Enable resize
-  $(window).resize(this.resize);
+  this.helpers.enableResize();
 
   // Fetch initial links
   this.reset(function() {
@@ -550,6 +584,6 @@ $(document).ready(function() {
   rib.init();
 
   setTimeout(function() {
-    $('a[name=subreddits]').trigger('click');
+    $('a[data-name=subreddits]').trigger('click');
   }, 0);
 });
