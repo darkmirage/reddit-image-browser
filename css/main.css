@@ -52,7 +52,7 @@ h1, h2, h3 {
 }
 
 #header h2 {
-  margin-top: 10px;
+  margin-top: 15px;
   color: #aaa;
   float: left;
   font-size: 0.8em;
@@ -141,6 +141,7 @@ h1, h2, h3 {
   padding: 5px;
   text-transform: lowercase;
   font-size: 12px;
+  border-radius: 3px;
 }
 
 #loading span {
@@ -272,9 +273,9 @@ a {
 
 .shadow {
   overflow: hidden;
-  -moz-box-shadow: 0px 0px 3px #aaa !important;
-  -webkit-box-shadow: 0px 0px 3px #aaa !important;
-  box-shadow: 0px 0px 3px #aaa !important;
+  -moz-box-shadow: 0px 0px 3px #999 !important;
+  -webkit-box-shadow: 0px 0px 3px #999 !important;
+  box-shadow: 0px 0px 3px #999 !important;
 }
 
 /* Post Meta */
