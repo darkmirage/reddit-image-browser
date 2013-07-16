@@ -41,14 +41,10 @@ function fetcher(args, callback) {
 // Underscore.js templates
 var templates = {};
 function loadTemplates() {
-  templates.user = '<div>' +
-                   '<%= item.name %>' +
-                   '</div>';
-
-  var ids = ['link', 'self', 'subreddit', 'meta'];
+  var ids = ['link', 'self', 'subreddit', 'meta', 'user'];
   for (var i = 0; i < ids.length; i++) {
     var id = ids[i];
-    templates[id] = $('#template-' + id).html();
+    templates[id] = _.template($('#template-' + id).html());
   }
 }
 
@@ -176,10 +172,6 @@ function MainView(subs, parent) {
   var after = null;
   var limit = 30;
 
-  var template = _.template(templates.link);
-  var meta_template = _.template(templates.meta);
-  var self_template = _.template(templates.self);
-
   var container = $('#links');
   this.container = container;
   var content = d3.select('#links');
@@ -247,8 +239,6 @@ function MainView(subs, parent) {
 
   // Display the selected item
   this.display = function(link) {
-    console.debug(link);
-
     var content = $('<div></div>').addClass('shadow');
 
     if (link.type == 'image') {
@@ -267,17 +257,14 @@ function MainView(subs, parent) {
       var elem = $('<div></div>');
       elem
         .addClass('self-post')
-        .html(self_template({ item: link.data }));
+        .html(templates.self({ item: link.data }));
     }
 
     curr.html('');
     content.attr('id', link.data.name);
     content.append(elem);
 
-    if (link.type == 'self' || link.type == 'page')
-      meta.html('');
-    else
-      meta.html(meta_template({ item: link.data }));
+    meta.html(templates.meta({ item: link.data }));
 
     curr.append(content);
   }
@@ -297,7 +284,7 @@ function MainView(subs, parent) {
     update.enter()
       .append('span')
       .style('left', function(d, i) { return (5 + i * 77) + 'px' })
-      .html(function(d) { return template({ item: d.data }); })
+      .html(function(d) { return templates.link({ item: d.data }); })
       .attr('class', 'thumbnail')
       .attr('data-name', function(d, i) { return d.data.name; })
       .attr('data-index', function(d, i) { return i; })
@@ -338,8 +325,6 @@ function MainView(subs, parent) {
         d.url += '.jpg';
         link.type = 'image';
       }
-
-      console.debug(d.thumbnail);
 
       if (d.thumbnail == 'self' || d.is_self) {
         d.thumbnail = './img/self.png';
@@ -445,6 +430,9 @@ function MainView(subs, parent) {
         that.select(index);
       }
     },
+    enableResize: function() {
+
+    },
     enableScroll: function() {
       $('#scroll-left').hover(function() {
         scrolling = true;
@@ -523,6 +511,9 @@ function MainView(subs, parent) {
 
   this.helpers.enableScroll();
 
+  // Enable resize
+  $(window).resize(this.resize);
+
   // Fetch initial links
   this.reset(function() {
     that.select(0);
@@ -535,7 +526,6 @@ function MainView(subs, parent) {
 function ItemList(container, template) {
   var that = this;
   this.list = [];
-  template = _.template(template);
 
   this.parse = function(list) {
     that.list = that.list.concat(list);

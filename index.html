@@ -56,4 +56,46 @@
 
 </body>
 
+<!-- Underscore.js templates -->
+
+<script type="text/template" id="template-meta">
+<h3><a href="<%= item.url %>"><%= item.title %></a></h3>
+<div>
+  <ul>
+    <li class="author">
+      posted by <a href="http://www.reddit.com/user/<%= item.author %>"><%= item.author %></a><br/>
+      in <a href="http://www.reddit.com/r/<%= item.subreddit %>">r/<%= item.subreddit %></a>
+    </li>
+    <li>
+      <span class="meta-score"><%= item.score %></span>
+      <span class="meta-ups"><%= item.ups %></span>
+      <span class="meta-downs"><%= item.downs %></span>
+    </li>
+  </ul>
+</div>
+</script>
+
+<script type="text/template" id="template-link">
+  <a href="http://www.reddit.com<%= item.permalink %>"><h2><%= item.title %></h2></a>
+</script>
+
+<script type="text/template" id="template-self">
+<div class="self-text">
+  <%= item.selftext %>
+  <a href="http://www.reddit.com/user/<%= item.author %>">&mdash; <%= item.author %></a>
+</div>
+</script>
+
+<script type="text/template" id="template-subreddit">
+<li>
+  <a href="#" name="<%= item.display_name %>"><%= item.display_name %></a>
+</li>
+</script>
+
+<script type="text/template" id="template-user">
+<div>
+  <%= item.name %>
+</div>
+</script>
+
 </html>

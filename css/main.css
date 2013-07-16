@@ -238,6 +238,10 @@ a {
   display: inline-block;
 }
 
+#post a {
+  color: #252525;
+}
+
 #post iframe {
   width: 860px;
   height: 600px;
@@ -247,10 +251,13 @@ a {
   padding: 20px;
   max-width: 860px;
   background: #fff;
+  text-align: left;
+  line-height: 25px;
 }
 
-#post h3 {
-  margin: 0;
+#post .self-post a {
+  font-style: italic;
+  color: #555;
 }
 
 .box {
