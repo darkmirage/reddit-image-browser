@@ -57,7 +57,7 @@ function RedditImageBrowser(config) {
   rib.config = {};
   rib.config.cage_id = '#ribcage';
   rib.config.sub_id = '#subreddits';
-  rib.config.defaults = ['trees'];
+  rib.config.defaults = ['trees', 'worldnews'];
 
   // Configuration parser
   rib.set = function(config) {

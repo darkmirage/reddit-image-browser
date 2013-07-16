@@ -3,10 +3,7 @@
 
 <head>
   <title>Reddit Image Browser</title>
-
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
-
 </head>
 
 <body>
@@ -89,10 +86,20 @@
 </script>
 
 <script type="text/template" id="template-self">
-<div class="self-text post-content">
-  <%= item.selftext %>
-  <a href="http://www.reddit.com/user/<%= item.author %>">&mdash; <%= item.author %></a>
-</div>
+<% if (item.selftext != '') { %>
+  <div class="self-text post-content">
+    <%= item.selftext %>
+    <a href="http://www.reddit.com/user/<%= item.author %>">&mdash; <%= item.author %></a>
+  </div>
+<% } else { %>
+  <a href="<%= item.url %>" class="empty-content">
+  <div>
+    <span>Click to open link</span>
+    Alternatively, press <em>v</em> on your keyboard
+  </div>
+  </a>
+<% } %>
+
 </script>
 
 <script type="text/template" id="template-subreddit">

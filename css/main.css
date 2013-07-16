@@ -16,7 +16,7 @@ ol, ul {
 }
 
 body {
-  font-family: 'Verdana', 'Open Sans', sans-serif;
+  font-family: 'Verdana', 'Tahoma', 'Arial', sans-serif;
   background: #dfdfdf;
   overflow-x: hidden;
 }
@@ -250,7 +250,7 @@ a {
 
 #post .self-post {
   padding: 20px;
-  max-width: 860px;
+  max-width: 640px;
   background: #fff;
   text-align: left;
   line-height: 25px;
@@ -276,6 +276,33 @@ a {
   -moz-box-shadow: 0px 0px 3px #999 !important;
   -webkit-box-shadow: 0px 0px 3px #999 !important;
   box-shadow: 0px 0px 3px #999 !important;
+}
+
+#post .empty-content {
+  font-size: 12px;
+  text-align: center;
+  background: url('../img/open.png') no-repeat center 20px;
+  display: block;
+  position: relative;
+  width: 250px;
+  height: 200px;
+  overflow: hidden;
+  font-style: normal !important;
+}
+
+#post .empty-content span {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#post .empty-content em {
+  font-style: normal;
+  font-weight: bold;
+}
+
+#post .empty-content:hover {
+  color: #000;
 }
 
 /* Post Meta */
