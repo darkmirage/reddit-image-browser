@@ -211,7 +211,7 @@ function MainView(subs, parent) {
   this.parse = function(json, url) {
     that.links = that.links.concat(json.data.children);
     after = that.links[that.links.length - 1].data.name;
-    that.helpers.format();
+    that.format();
     that.render();
     loading = false;
     that.helpers.hideLoading();
@@ -305,6 +305,52 @@ function MainView(subs, parent) {
 
     // Kind of hacky? Couldn't get d3 selects to work for [data-index=]
     that.display(elem[0].__data__);
+  }
+
+  this.format = function() {
+    that.links = _.compact(that.links);
+    for (var i = 0; i < that.links.length; i++) {
+      var link = that.links[i];
+      var d = link.data;
+      var type = d.url.substr(d.url.length - 3, 3);
+
+      if (_.indexOf(['png', 'jpg', 'gif'], type) != -1) {
+        link.type = 'image';
+      }
+      else if (d.url.indexOf('imgur.com/a/') != -1) {
+        link.type = 'album';
+      }
+      else if (d.url.indexOf('imgur.com/gallery/') != -1) {
+        d.url = d.url.replace(/\/new$/, '');
+        d.url = d.url.replace('imgur.com/gallery/', 'imgur.com/') + '.jpg';
+        link.type = 'image';
+      }
+      else if (d.url.indexOf('imgur.com') != -1) {
+        d.url += '.jpg';
+        link.type = 'image';
+      }
+
+      if (d.thumbnail == '') {
+        d.thumbnail = './img/nothumb.png';
+      }
+      else if (d.thumbnail == 'default') {
+        d.thumbnail = './img/nothumb.png';
+      }
+      else if (d.thumbnail == 'self') {
+        d.thumbnail = './img/self.png';
+        link.type = 'self';
+      }
+      else if (d.thumbnail == 'nsfw') {
+        d.thumbnail = './img/nsfw.png';
+      }
+
+      if (link.type === undefined) {
+        link.type = 'page';
+      }
+
+      // preload images
+      that.helpers.preload(link);
+    }
   }
 
   // Helper functions
@@ -447,51 +493,6 @@ function MainView(subs, parent) {
           that.helpers.hideLoading('bar');
         });
       }
-    },
-    format: function() {
-      that.links = _.compact(that.links);
-      for (var i = 0; i < that.links.length; i++) {
-        var link = that.links[i];
-        var d = link.data;
-        var type = d.url.substr(d.url.length - 3, 3);
-
-        if (_.indexOf(['png', 'jpg', 'gif'], type) != -1) {
-          link.type = 'image';
-        }
-        else if (d.url.indexOf('imgur.com/a/') != -1) {
-          link.type = 'album';
-        }
-        else if (d.url.indexOf('imgur.com/gallery/') != -1) {
-          d.url = d.url.replace(/\/new$/, '');
-          d.url = d.url.replace('imgur.com/gallery/', 'imgur.com/') + '.jpg';
-          link.type = 'image';
-        }
-        else if (d.url.indexOf('imgur.com') != -1) {
-          d.url += '.jpg';
-          link.type = 'image';
-        }
-
-        if (d.thumbnail == '') {
-          d.thumbnail = './img/nothumb.png';
-        }
-        else if (d.thumbnail == 'default') {
-          d.thumbnail = './img/nothumb.png';
-        }
-        else if (d.thumbnail == 'self') {
-          d.thumbnail = './img/self.png';
-          link.type = 'self';
-        }
-        else if (d.thumbnail == 'nsfw') {
-          d.thumbnail = './img/nsfw.png';
-        }
-
-        if (link.type === undefined) {
-          link.type = 'page';
-        }
-
-        // preload images
-        that.helpers.preload(link);
-      }
     }
   }
 
@@ -535,7 +536,6 @@ $(document).ready(function() {
   // rib.fetch({ type: 'hot', limit: 4, after: 'test' });
 
   rib.init();
-  // rib.fetch({type: 'user', name: 'DarkMirage'});
   setTimeout(function() {
     $('a[name=subreddits]').trigger('click');
   }, 0);
