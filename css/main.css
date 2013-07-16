@@ -25,6 +25,10 @@ body {
   text-align: center;
 }
 
+h1, h2, h3 {
+  color: #252525
+}
+
 /* Header */
 
 #header {
@@ -218,6 +222,7 @@ a {
 #post {
   min-height: 200px;
   min-width: 200px;
+  padding-bottom: 5px;
   text-align: center;
   position: relative;
 }
@@ -236,6 +241,16 @@ a {
 #post iframe {
   width: 860px;
   height: 600px;
+}
+
+#post .self-post {
+  padding: 20px;
+  max-width: 860px;
+  background: #fff;
+}
+
+#post h3 {
+  margin: 0;
 }
 
 .box {
@@ -264,12 +279,48 @@ a {
 }
 
 #post-meta h3 {
+  font-size: 15px;
+  font-weight: bold;
   padding: 5px;
   float: left;
-  width: 400px;
+  max-width: 640px;
+}
+
+#post-meta h3, #post-meta div {
+  padding: 5px;
   margin: 0;
+}
+
+.meta-ups, .meta-downs {
+  padding-right: 5px;
+}
+
+.meta-ups:after {
+  content: '\25B2';
+  color: rgb(255, 139, 36);
+}
+
+.meta-downs:after {
+  content: '\25BC';
+  color: rgb(148, 148, 255);
+}
+
+.meta-score {
+  padding-right: 20px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #252525;
+}
+
+#post-meta div {
+  color: #555;
+  max-width: 200px;
   font-size: 10px;
-  font-weight: normal;
+  float: right;
+}
+
+#post-meta a {
+  color: #252525;
 }
 
 /* Footer fix */

@@ -40,20 +40,17 @@ function fetcher(args, callback) {
 
 // Underscore.js templates
 var templates = {};
-templates.user = '<div>' +
-                 '<%= item.name %>' +
-                 '</div>';
+function loadTemplates() {
+  templates.user = '<div>' +
+                   '<%= item.name %>' +
+                   '</div>';
 
-templates.link = '<a href="http://www.reddit.com<%= item.permalink %>"><h2><%= item.title %></h2></a>';
-
-templates.subreddit = '<li>' +
-                     '<a href="#" name="<%= item.display_name %>">' +
-                     '<%= item.display_name %>' +
-                     '</a>' +
-                     '</li>';
-
-templates.meta = '<h3 class="box shadow"><%= item.title %></h3>' +
-                 '<div class="box shadow"></div>'
+  var ids = ['link', 'self', 'subreddit', 'meta'];
+  for (var i = 0; i < ids.length; i++) {
+    var id = ids[i];
+    templates[id] = $('#template-' + id).html();
+  }
+}
 
 // Main RIB class
 function RedditImageBrowser(config) {
@@ -64,7 +61,7 @@ function RedditImageBrowser(config) {
   rib.config = {};
   rib.config.cage_id = '#ribcage';
   rib.config.sub_id = '#subreddits';
-  rib.config.defaults = ['pics'];
+  rib.config.defaults = ['trees'];
 
   // Configuration parser
   rib.set = function(config) {
@@ -181,6 +178,8 @@ function MainView(subs, parent) {
 
   var template = _.template(templates.link);
   var meta_template = _.template(templates.meta);
+  var self_template = _.template(templates.self);
+
   var container = $('#links');
   this.container = container;
   var content = d3.select('#links');
@@ -248,28 +247,38 @@ function MainView(subs, parent) {
 
   // Display the selected item
   this.display = function(link) {
-    d = link.data;
+    console.debug(link);
 
     var content = $('<div></div>').addClass('shadow');
-    var old = curr.find('.shadow');
-
 
     if (link.type == 'image') {
       var elem = link.img;
+      elem.addClass('post-content');
     }
     else if (link.type == 'album') {
       var elem = $('<iframe></iframe>');
       elem
-        .addClass('imgur-album')
+        .addClass('post-content')
         .attr('frameborder', 0)
         .attr('src', link.data.url + '/embed');
       link.iframe = elem;
     }
+    else if (link.type == 'self' || link.type == 'page') {
+      var elem = $('<div></div>');
+      elem
+        .addClass('self-post')
+        .html(self_template({ item: link.data }));
+    }
 
-    content.attr('id', d.name);
+    curr.html('');
+    content.attr('id', link.data.name);
     content.append(elem);
-    meta.html(meta_template({ item: d }));
-    old.remove();
+
+    if (link.type == 'self' || link.type == 'page')
+      meta.html('');
+    else
+      meta.html(meta_template({ item: link.data }));
+
     curr.append(content);
   }
 
@@ -330,15 +339,17 @@ function MainView(subs, parent) {
         link.type = 'image';
       }
 
-      if (d.thumbnail == '') {
-        d.thumbnail = './img/nothumb.png';
-      }
-      else if (d.thumbnail == 'default') {
-        d.thumbnail = './img/nothumb.png';
-      }
-      else if (d.thumbnail == 'self') {
+      console.debug(d.thumbnail);
+
+      if (d.thumbnail == 'self' || d.is_self) {
         d.thumbnail = './img/self.png';
         link.type = 'self';
+      }
+      else if (d.thumbnail == '' || d.thumbnail == 'default') {
+        if (link.type == 'image')
+          d.thumbnail = './img/img.png';
+        else
+          d.thumbnail = './img/nothumb.png';
       }
       else if (d.thumbnail == 'nsfw') {
         d.thumbnail = './img/nsfw.png';
@@ -351,6 +362,17 @@ function MainView(subs, parent) {
       // preload images
       that.helpers.preload(link);
     }
+  }
+
+  this.resize = function() {
+    var cur = $('#post .post-content');
+    var height = 0;
+    height += $('#header').height();
+    height += $('#links').height();
+    height += $('#footer').height();
+    height += $('#post-meta').height();
+    height = $(window).height() - height - 100;
+    cur.height(height);
   }
 
   // Helper functions
@@ -532,10 +554,11 @@ function ItemList(container, template) {
 $(document).ready(function() {
   console.log('DOM ready');
 
+  loadTemplates();
   window.rib = new RedditImageBrowser();
   // rib.fetch({ type: 'hot', limit: 4, after: 'test' });
-
   rib.init();
+
   setTimeout(function() {
     $('a[name=subreddits]').trigger('click');
   }, 0);
