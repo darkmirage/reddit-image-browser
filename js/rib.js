@@ -175,11 +175,13 @@ function RedditImageBrowser(config) {
         subParent.stop(true, false).animate({'right': '-10px'}, 500);
         handle.addClass('active');
         toggleSub = true;
+        $('#dark').stop(true, false).fadeIn(500);
       };
       var hide = function() {
         subParent.animate({'right': '-310px'}, 500);
         handle.removeClass('active');
         toggleSub = false;
+        $('#dark').fadeOut(500);
       };
 
       handle.click(function(e) {
@@ -194,12 +196,14 @@ function RedditImageBrowser(config) {
     var enableGuide = function(handle) {
       var guide = $('#guide');
       handle.hover(function() {
+        handle.addClass('hover');
         if (toggleFAQ) return;
         var left = ($(window).width() - guide.width()) / 2;
         guide.css('left', left + 'px');
         guide.fadeIn(0);
-        $('#dark').fadeIn(500);
+        $('#dark').stop(true, false).fadeIn(500);
       }, function() {
+        handle.removeClass('hover');
         if (toggleFAQ) return;
         guide.fadeOut(0);
         $('#dark').fadeOut(500);
@@ -211,7 +215,7 @@ function RedditImageBrowser(config) {
         faqView.show();
         handle.addClass('active');
         toggleFAQ = true;
-        $('#dark').fadeIn(500);
+        $('#dark').stop(true, false).fadeIn(500);
       };
       var hide = function() {
         faqView.hide();
@@ -704,7 +708,9 @@ function MainView(config) {
     preload: function(link) {
       if (link.type == 'image') {
         var timer;
-        link.img = $('<img/>').attr('src', link.data.url);
+        link.img = $('<img/>');
+        link.img.error(function() { link.type = 'page'; });
+        link.img.attr('src', link.data.url);
         link.thumb = $('<img/>').attr('src', link.data.thumbnail);
 
         that.helpers.showLoading('bar');
