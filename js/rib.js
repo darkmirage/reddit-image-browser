@@ -235,6 +235,7 @@ function RedditImageBrowser(config) {
     $('#faq').click(function() {
       $('a[data-name=faq]').trigger('click');
     });
+    $('#faq .page-content').click(function(e) { e.stopPropagation(); });
   }
 
   rib.init = function() {
