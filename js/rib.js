@@ -548,6 +548,16 @@ function MainView(config) {
           case 75:
             that.helpers.selectNext();
             break;
+          case 118:
+          case 86:
+          case 13:
+            window.open(that.links[selected.attr('data-index')].data.url, '_blank');
+            break;
+          case 99:
+          case 67:
+            var permalink = that.links[selected.attr('data-index')].data.permalink;
+            window.open('http://www.reddit.com' + permalink, '_blank');
+            break;
         }
       }
 
