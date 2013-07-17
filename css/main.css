@@ -1,8 +1,11 @@
 /* Reddit Image Browser */
 
-body, div, ul, h1, h2 {
+* {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
+}
+
+body, div, ul, h1, h2 {
   margin: 0;
   padding: 0;
   border: 0;

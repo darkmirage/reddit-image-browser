@@ -51,7 +51,7 @@
     <h2>Keyboard Shortcuts</h2>
     <ul>
       <li><span><em>j</em></span> go to previous post</li>
-      <li><span><em>k</em><em>k</em></span> go to next post</li>
+      <li><span><em>k</em></span> go to next post</li>
     </ul>
   </div>
 
@@ -65,12 +65,12 @@
 <!-- Underscore.js templates -->
 
 <script type="text/template" id="template-meta">
-<h3><a href="<%= item.url %>"><%= item.title %></a></h3>
+<h3><a href="http://www.reddit.com<%= item.permalink %>" target="_blank"><%= item.title %></a></h3>
 <div>
   <ul>
     <li class="author">
-      posted by <a href="http://www.reddit.com/user/<%= item.author %>"><%= item.author %></a><br/>
-      in <a href="http://www.reddit.com/r/<%= item.subreddit %>">r/<%= item.subreddit %></a>
+      posted by <a href="http://www.reddit.com/u/<%= item.author %>" target="_blank"><%= item.author %></a><br/>
+      in <a href="http://www.reddit.com/r/<%= item.subreddit %>" target="_blank">r/<%= item.subreddit %></a>
     </li>
     <li>
       <span class="meta-score"><%= item.score %></span>
@@ -82,7 +82,7 @@
 </script>
 
 <script type="text/template" id="template-link">
-  <a href="http://www.reddit.com<%= item.permalink %>"><h2><%= item.title %></h2></a>
+  <a href="<%= item.url %>"><h2><%= item.title %></h2></a>
 </script>
 
 <script type="text/template" id="template-self">

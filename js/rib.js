@@ -38,6 +38,22 @@ function fetcher(args, callback) {
   });
 }
 
+var params = {};
+function readParams() {
+  var query = window.location.search;
+  if (query.length == 0)
+    return;
+  if (query[0] == '?') query = query.substr(1);
+  var list = query.split('&');
+  for (var i = 0; i < list.length; i++) {
+    var pair = list[i].split('=');
+    params[pair[0]] = pair[1];
+  }
+
+  console.log('Parameters parsed');
+  console.debug(params);
+}
+
 // Underscore.js templates
 var templates = {};
 function loadTemplates() {
@@ -46,6 +62,7 @@ function loadTemplates() {
     var id = ids[i];
     templates[id] = _.template($('#template-' + id).html());
   }
+  console.log('Templates loaded');
 }
 
 // Main RIB class
@@ -57,7 +74,9 @@ function RedditImageBrowser(config) {
   rib.config = {};
   rib.config.cage_id = '#ribcage';
   rib.config.sub_id = '#subreddits';
-  rib.config.defaults = ['trees', 'worldnews'];
+  rib.config.defaults = ['pics'];
+  rib.config.hover_scroll = false;
+  rib.config.scroll_width = 860;
 
   // Configuration parser
   rib.set = function(config) {
@@ -129,7 +148,7 @@ function RedditImageBrowser(config) {
     var container = $(rib.config.sub_id);
     rib.subreddits = new ItemList(container, templates.subreddit);
     // Initialize main view
-    rib.main = new MainView(rib.config.defaults, rib.cage);
+    rib.main = new MainView(rib.config);
 
 
     var enableSub = function(handle) {
@@ -180,17 +199,16 @@ function RedditImageBrowser(config) {
 }
 
 // Item parsing and rendering for the main links
-function MainView(subs, parent) {
+function MainView(config) {
   var that = this;
 
-  this.subs = subs.slice(0);
+  this.subs = config.defaults.slice(0);
   this.links = [];
   this.urls = [];
   var after = null;
   var limit = 30;
 
   var container = $('#links');
-  this.container = container;
   var content = d3.select('#links');
   var curr = $('#post');
   var meta = $('#post-meta');
@@ -227,7 +245,7 @@ function MainView(subs, parent) {
 
   this.more = function(callback) {
     if (loading)
-      return;
+      return false;
     loading = true;
     that.helpers.showLoading();
 
@@ -243,6 +261,7 @@ function MainView(subs, parent) {
       if (callback !== undefined)
         callback(json);
     });
+    return true;
   }
 
   this.reset = function(callback) {
@@ -413,33 +432,32 @@ function MainView(subs, parent) {
         $('#loading').fadeOut(500);
     },
     scrollHome: function() {
-      that.container.scrollLeft(0);
+      container.scrollLeft(0);
       $('#scroll-left').hide();
     },
     scroll: function(rate, i) {
       if (i === undefined)
         i = 0;
 
-      if (!scrolling && i >= 0)
+      if (!scrolling && i >= 0 || rate == 0)
         return;
 
-      var x = that.container.scrollLeft();
-      that.container.scrollLeft(container.scrollLeft() + rate);
+      var prev = container.scrollLeft();
+      var target = prev + rate;
 
-      if (that.container.scrollLeft() == 0) {
-        $('#scroll-left').hide();
-        return;
-      } else {
-        $('#scroll-left').show();
-      }
+      // Scroll animation
+      var duration = i >= 0 ? 0 : 400;
+      container.animate({ scrollLeft: target }, duration, function() {
+        if (container.scrollLeft() < target && !loading) {
+          that.more();
+        }
 
-      if (x == that.container.scrollLeft() && !loading) {
-        that.more();
-      }
-
-      // Someday I'll figure out how to put an ease function into this...
-      // rate = i >= 200 && i < 300 ? rate * 1.02 : rate;
-      // console.debug(that.container.scrollLeft());
+        if (container.scrollLeft() == 0) {
+          $('#scroll-left').hide();
+        } else {
+          $('#scroll-left').show();
+        }
+      });
 
       // Set i to negative for a one-off scroll job!
       if (i < 0)
@@ -449,34 +467,54 @@ function MainView(subs, parent) {
         that.helpers.scroll(rate, i + 1);
       }, 10);
     },
+    scrollTo: function(target) {
+      var curr = container.scrollLeft();
+      var step = target - curr;
+      that.helpers.scroll(step, -1);
+    },
     selectNext: function() {
       var index = parseInt(selected.attr('data-index')) + 1;
-      if (index < that.links.length) {
-        that.select(index);
-      }
-      if (index > that.links.length - 5) {
-        that.more();
-      }
+      if (index >= that.links.length)
+        return;
+      that.select(index);
+
+      var pos = parseInt(selected.css('left'), 10) + selected.width();
+      var scroll_pos = container.scrollLeft() + config.scroll_width;
+      if (pos >= scroll_pos)
+        that.helpers.scrollTo(pos - selected.width() - 5);
     },
     selectPrev: function() {
       var index = parseInt(selected.attr('data-index')) - 1;
-      if (index >= 0) {
-        that.select(index);
-      }
+      if (index < 0)
+        return;
+      that.select(index);
+
+      var pos = parseInt(selected.css('left'), 10);
+      var scroll_pos = container.scrollLeft();
+      if (pos < scroll_pos)
+        that.helpers.scrollTo(pos - config.scroll_width);
     },
     enableResize: function() {
       $(window).resize(function() { that.resize(true); });
     },
     enableScroll: function() {
-      $('#scroll-left').hover(function() {
-        scrolling = true;
-        that.helpers.scroll(-10);
-
-      }, function() { scrolling = false; });
-      $('#scroll-right').hover(function() {
-        scrolling = true;
-        that.helpers.scroll(10);
-      }, function() { scrolling = false });
+      if (config.hover_scroll) {
+        $('#scroll-left').hover(function() {
+          scrolling = true;
+          that.helpers.scroll(-10);
+        }, function() { scrolling = false; });
+        $('#scroll-right').hover(function() {
+          scrolling = true;
+          that.helpers.scroll(10);
+        }, function() { scrolling = false });
+      } else {
+        $('#scroll-left').click(function() {
+          that.helpers.scroll(-700, -1);
+        });
+        $('#scroll-right').click(function() {
+          that.helpers.scroll(700, -1);
+        });
+      }
     },
     enableLinks: function() {
       var links = container.find('.thumbnail');
@@ -578,6 +616,7 @@ function ItemList(container, template) {
 $(document).ready(function() {
   console.log('DOM ready');
 
+  readParams();
   loadTemplates();
   window.rib = new RedditImageBrowser();
   // rib.fetch({ type: 'hot', limit: 4, after: 'test' });
