@@ -498,6 +498,7 @@ html, body {
   top: 0;
   left: 0;
   right: 0;
+  cursor: pointer;
 }
 
 #dark {
@@ -514,7 +515,6 @@ html, body {
   position: absolute;
   text-align: center;
   z-index: 5;
-  cursor: pointer;
 }
 
 .page-content {

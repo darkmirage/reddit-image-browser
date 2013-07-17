@@ -201,12 +201,12 @@ function RedditImageBrowser(config) {
         var left = ($(window).width() - guide.width()) / 2;
         guide.css('left', left + 'px');
         guide.fadeIn(0);
-        $('#dark').stop(true, false).fadeIn(500);
+        $('#dark').stop(true, false).fadeIn(300);
       }, function() {
         handle.removeClass('hover');
         if (toggleFAQ) return;
-        guide.fadeOut(0);
-        $('#dark').fadeOut(500);
+        guide.fadeOut(300);
+        $('#dark').fadeOut(0);
       });
     }
 
@@ -236,8 +236,15 @@ function RedditImageBrowser(config) {
     enableSub($('a[data-name=subreddits]'));
     enableGuide($('a[data-name=guide]'));
     enableFAQ($('a[data-name=faq]'));
-    $('#faq').click(function() {
-      $('a[data-name=faq]').trigger('click');
+
+    /* Trigger their respective buttons to close overlays. Kind of dumb but
+       it works since I neglected to write externally-accessible functions
+       for closing the popups... */
+    $('#dark, .page').click(function() {
+      if (toggleFAQ)
+        $('a[data-name=faq]').trigger('click');
+      if (toggleSub)
+        $('a[data-name=subreddits]').trigger('click');
     });
     $('#faq .page-content').click(function(e) { e.stopPropagation(); });
   }
@@ -249,6 +256,12 @@ function RedditImageBrowser(config) {
     rib.main = new MainView(rib.config);
 
     rib.enableHandles();
+
+    // Kind of bruteforce way of avoiding ugly text selections
+    rib.cage.bind('selectstart dragstart', function(e) {
+      e.preventDefault();
+      return false;
+    });
 
     // Fetch subreddit selections
     rib.fetch({ type: 'subreddits', name: 'popular' }, function(json) {
@@ -657,8 +670,8 @@ function MainView(config) {
           case 114: case 82:
             window.open('http://www.reddit.com/r/' + d.data.subreddit, '_blank');
             break;
-          // f - simplify UI
-          case 102: case 70:
+          // s - simplify UI
+          case 115: case 83:
             if (simple) {
               $('#post-meta').css('margin-top', '0');
               simple.remove();
@@ -773,6 +786,11 @@ function ItemList(container, template) {
       container.append(elem);
     }
   }
+}
+
+// YouTube API callback
+function onYouTubePlayerReady(playerId) {
+  console.log('YouTube API ready');
 }
 
 $(document).ready(function() {
