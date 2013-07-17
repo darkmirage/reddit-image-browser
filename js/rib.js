@@ -164,14 +164,12 @@ function RedditImageBrowser(config) {
     rib.add(name);
   }
 
-  rib.init = function() {
-    // Subreddit selection
-    rib.subreddits = new ItemList(rib.subview, templates.subreddit);
-    // Initialize main view
-    rib.main = new MainView(rib.config);
-
+  rib.enableHandles = function() {
     var toggleSub = false;
+    var toggleFAQ = false;
     var subParent = rib.subview.parent();
+    var faqView = $('#faq');
+
     var enableSub = function(handle) {
       var show = function() {
         subParent.stop(true, false).animate({'right': '-10px'}, 500);
@@ -185,10 +183,8 @@ function RedditImageBrowser(config) {
       };
 
       handle.click(function(e) {
-        if (!toggleSub)
-          show();
-        else
-          hide();
+        if (!toggleSub && !toggleFAQ) show();
+        else hide();
         e.preventDefault();
       });
 
@@ -198,18 +194,56 @@ function RedditImageBrowser(config) {
     var enableGuide = function(handle) {
       var guide = $('#guide');
       handle.hover(function() {
+        if (toggleFAQ) return;
         var left = ($(window).width() - guide.width()) / 2;
         guide.css('left', left + 'px');
         guide.fadeIn(0);
-        rib.cage.hide();
+        $('#dark').fadeIn(500);
       }, function() {
+        if (toggleFAQ) return;
         guide.fadeOut(0);
-        rib.cage.show();
+        $('#dark').fadeOut(500);
+      });
+    }
+
+    var enableFAQ = function(handle) {
+      var show = function() {
+        faqView.show();
+        handle.addClass('active');
+        toggleFAQ = true;
+        $('#dark').fadeIn(500);
+      };
+      var hide = function() {
+        faqView.hide();
+        handle.removeClass('active');
+        toggleFAQ = false;
+        $('#dark').fadeOut(500);
+      };
+
+      handle.click(function(e) {
+        if (!toggleFAQ)
+          show();
+        else
+          hide();
+        e.preventDefault();
       });
     }
 
     enableSub($('a[data-name=subreddits]'));
     enableGuide($('a[data-name=guide]'));
+    enableFAQ($('a[data-name=faq]'));
+    $('#faq').click(function() {
+      $('a[data-name=faq]').trigger('click');
+    });
+  }
+
+  rib.init = function() {
+    // Subreddit selection
+    rib.subreddits = new ItemList(rib.subview, templates.subreddit);
+    // Initialize main view
+    rib.main = new MainView(rib.config);
+
+    rib.enableHandles();
 
     // Fetch subreddit selections
     rib.fetch({ type: 'subreddits', name: 'popular' }, function(json) {

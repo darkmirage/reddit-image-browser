@@ -64,31 +64,39 @@
     </ul>
   </div>
 
-  <div id="faq">
-    <h3>WTF is RIB?</h3>
-    <p>Reddit Image Browser (RIB) is an image browser for Reddit (duh) built completely on JavaScript. It lets you browse through the frontpage posts on image subreddits like an image album, complete with keyboard navigation and infinite autoloading.<sup>1</sup> Technically it works fine with self, link, and video posts but I made it to rapidly and lazily browse images.</p>
 
-    <h3>How do I use RIB?</h3>
-    <p>Just keep pressing k on your keyboard.</p>
+  <div id="faq" class="page">
+    <div class="page-content">
+      <h2>Frequently<sup>1</sup> Asked Questions</h2>
+      <div>
+        <h3>WTF is RIB?</h3>
+        <p>Reddit Image Browser (RIB) is an image browser for Reddit (duh) built completely with JavaScript. It lets you browse through the frontpage posts on image subreddits like an image album, complete with keyboard navigation and infinite autoloading.<sup>2</sup> Technically it works fine with self, link, and video posts but I made it to rapidly and lazily browse images.</p>
 
-    <h3>Why JavaScript?</h3>
-    <p>JavaScript is awesome. Actually, the main reason is that JavaScript runs completely in your browser. Being a poor college student, I cannot afford running anything on the server side, which means no Rails or databases. All interactions with Reddit's API used by RIB are performed by your browser.</p>
+        <h3>How do I use RIB?</h3>
+        <p>Just keep pressing k on your keyboard.</p>
 
-    <h3>Why can't I upvote links or post comments?</h3>
-    <p>Unfortunately, the limitations imposed by <a href="http://en.wikipedia.org/wiki/Same_origin_policy" target="_blank">same origin policy</a> and JSONP prevents me from using any API functions requiring user authentication. That's what I get for being cheap.</p>
+        <h3>Why JavaScript?</h3>
+        <p>JavaScript is awesome. Actually, the main reason is that JavaScript runs completely in your browser. Being a poor college student, I cannot afford running anything on the server side, which means no Rails or databases. All interactions with Reddit's API used by RIB are performed by your browser.</p>
 
-    <h3>I want to request a feature!</h3>
-    <p>You can drop me an email here. I will send you a polite reply.<sup>2</sup></p>
+        <h3>Why can't I upvote links or post comments?</h3>
+        <p>Unfortunately, the limitations imposed by <a href="http://en.wikipedia.org/wiki/Same_origin_policy" target="_blank">same origin policy</a> and JSONP prevents me from using any API functions requiring user authentication. That's what I get for being cheap.</p>
 
-    <h3>Things are broken!</h3>
-    <p>See above.</p>
+        <h3>I want to request a feature!</h3>
+        <p>You can drop me an email here. I will send you a polite reply.<sup>3</sup></p>
 
-    <ul class="footnotes">
-      <li>1. Infinite until your RAM explodes from the inefficient object array I used.</li>
-      <li>2. Reply may take up to 10 business days</li>
-    </ul>
+        <h3>Things are broken!</h3>
+        <p>See above.</p>
+      </div>
 
+      <ul class="footnotes">
+        <li>1. No one asked these questions. Ever.</li>
+        <li>2. Infinite until your RAM explodes from the inefficient object array I used.</li>
+        <li>3. Reply may take up to 10 business days.</li>
+      </ul>
+    </div>
   </div>
+
+  <div id="dark"></div>
 
   <script src="lib/jquery-2.0.3.min.js" type="text/javascript"></script>
   <script src="lib/underscore-min.js" type="text/javascript"></script>
