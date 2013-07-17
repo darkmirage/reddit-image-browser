@@ -74,7 +74,7 @@ function RedditImageBrowser(config) {
   rib.config = {};
   rib.config.cage_id = '#ribcage';
   rib.config.sub_id = '#subreddits';
-  rib.config.defaults = ['videos'];
+  rib.config.defaults = ['aww', 'pics', 'cringepics', 'gifs', 'videos'];
   rib.config.hover_scroll = false;
   rib.config.scroll_width = 860;
 
@@ -86,6 +86,7 @@ function RedditImageBrowser(config) {
       }
     }
     rib.cage = $(rib.config.cage_id);
+    rib.subview = $(rib.config.sub_id)
   }
 
   // Parse configurations
@@ -143,23 +144,55 @@ function RedditImageBrowser(config) {
     rib.main.remove(subreddit);
   }
 
+  rib.enableSubreddits = function() {
+    rib.subview.find('a').on('click', function() {
+    if ($(this).hasClass('active'))
+      rib.remove($(this).attr('data-name'));
+    else
+      rib.add($(this).attr('data-name'));
+    $(this).toggleClass('active');
+    });
+  }
+
+  rib.addSubreddit = function(name) {
+    var item = {}
+    item.display_name = name;
+    var elem = $(templates.subreddit({ item: item }));
+    elem.find('a').addClass('active');
+    $(rib.config.sub_id).append(elem);
+    rib.enableSubreddits();
+    rib.add(name);
+  }
+
   rib.init = function() {
     // Subreddit selection
-    var container = $(rib.config.sub_id);
-    rib.subreddits = new ItemList(container, templates.subreddit);
+    rib.subreddits = new ItemList(rib.subview, templates.subreddit);
     // Initialize main view
     rib.main = new MainView(rib.config);
 
-
+    var toggleSub = false;
+    var subParent = rib.subview.parent();
     var enableSub = function(handle) {
-      var parent = $(rib.config.sub_id).parent();
-      handle.hover(function() {
-        parent.stop(true, false).animate({'right': '-10px'}, 900);
-      }, function() {
+      var show = function() {
+        subParent.stop(true, false).animate({'right': '-10px'}, 500);
+        handle.addClass('active');
+        toggleSub = true;
+      };
+      var hide = function() {
+        subParent.animate({'right': '-310px'}, 500);
+        handle.removeClass('active');
+        toggleSub = false;
+      };
+
+      handle.click(function(e) {
+        if (!toggleSub)
+          show();
+        else
+          hide();
+        e.preventDefault();
       });
-      parent.hover(function() {}, function() {
-        parent.animate({'right': '-310px'}, 800);
-      });
+
+      rib.subview.parent().find('.close').on('click', hide);
     }
 
     var enableGuide = function(handle) {
@@ -184,16 +217,9 @@ function RedditImageBrowser(config) {
 
       // Initialize default selection of subs
       for (var i = 0; i < rib.main.subs.length; i++) {
-        $('a[name=' + rib.main.subs[i] + ']').addClass('active');
+        $('a[data-name=' + rib.main.subs[i] + ']').addClass('active');
       }
-
-      container.find('a').on('click', function() {
-        if ($(this).hasClass('active'))
-          rib.remove($(this).attr('name'));
-        else
-          rib.add($(this).attr('name'));
-        $(this).toggleClass('active');
-      });
+      rib.enableSubreddits();
     });
   }
 }
@@ -216,6 +242,7 @@ function MainView(config) {
   var scrolling = false;
   var loading = false;
   var selected = null;
+  var simple = null;
 
   // These operate on the Subreddit list
   this.remove = function(entry) {
@@ -249,10 +276,15 @@ function MainView(config) {
     loading = true;
     that.helpers.showLoading();
 
-    var name = that.subs.join('+');
     args = {};
-    args.type = 'r';
-    args.name = name;
+    if (that.subs.length == 0) {
+      args.type = 'hot';
+    } else {
+      var name = that.subs.join('+');
+      args.type = 'r';
+      args.name = name;
+    }
+
     if (after != null)
       args.after = after;
 
@@ -270,7 +302,11 @@ function MainView(config) {
     after = null;
     limit = 30;
     that.helpers.scrollHome();
-    that.more(callback);
+    that.more(function(json) {
+      that.select(0);
+      if (callback !== undefined)
+        callback(json);
+    });
   }
 
   // Display the selected item
@@ -402,8 +438,11 @@ function MainView(config) {
     var doResize = function() {
       var curr = $('#post .post-content');
       var height = 0;
-      height += $('#header').height();
-      height += $('#links').height();
+
+      if (!simple) {
+        height += $('#header').height();
+        height += $('#links').height();
+      }
       // height += $('#footer').height();
       height += $('#post-meta').height();
       // Kind of hacky since I'm accounting for margins manually
@@ -559,26 +598,48 @@ function MainView(config) {
       var keyHandler = function(e) {
         var d = that.selected().data;
         switch (e.which) {
-          case 106:
-          case 74:
+          // j - prev
+          case 106: case 74:
             that.helpers.selectPrev();
             break;
-          case 107:
-          case 75:
+          // k - next
+          case 107: case 75:
             that.helpers.selectNext();
             break;
-          case 118:
-          case 86:
-          case 13:
+          // v, enter - open link
+          case 118: case 86: case 13:
             window.open(d.data.url, '_blank');
             break;
-          case 99:
-          case 67:
+          // c, n - open comments
+          case 99: case 67: case 110: case 78:
             window.open('http://www.reddit.com' + d.permalink, '_blank');
             break;
-          case 114:
-          case 82:
+          // r - open subreddit page
+          case 114: case 82:
             window.open('http://www.reddit.com/r/' + d.data.subreddit, '_blank');
+            break;
+          // f - simplify UI
+          case 102: case 70:
+            if (simple) {
+              $('#post-meta').css('margin-top', '0');
+              simple.remove();
+              simple = null;
+            } else {
+              $('#post-meta').css('margin-top', '40px');
+              simple = $('<div></div>');
+              simple.html('Press f again to unhide UI').attr('id', 'noty');
+              $('body').append(simple);
+              setTimeout(function() {
+                simple.fadeOut(1500);
+              }, 3000)
+            }
+            $('#link-container, #header').toggle();
+            that.resize();
+            break;
+          // o - choose subreddits
+          case 111: case 79:
+            // hacky hack way because my code layering is dumb
+            $('a[data-name=subreddits]').trigger('click');
             break;
         }
       }
@@ -649,9 +710,7 @@ function MainView(config) {
   this.helpers.enableResize();
 
   // Fetch initial links
-  this.reset(function() {
-    that.select(0);
-  });
+  this.reset();
 
   this.helpers.enableKeyboard();
 }
@@ -682,8 +741,4 @@ $(document).ready(function() {
   loadTemplates();
   window.rib = new RedditImageBrowser();
   rib.init();
-
-  setTimeout(function() {
-    $('a[data-name=subreddits]').trigger('click');
-  }, 0);
 });

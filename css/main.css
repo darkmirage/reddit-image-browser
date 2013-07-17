@@ -61,40 +61,52 @@ h1, h2, h3 {
   font-size: 0.8em;
 }
 
-#header h2 span {
+#header h2 span, #header h2 a {
   color: #fff;
 }
 
 #header .nav {
+  padding-right: 5px;
+  padding-top: 6px;
   display: block;
   float: right;
   height: 100%;
 }
 
-.drawer-handle {
+.nav .drawer-handle {
+  display: inline-block;
   position: relative;
-  top: 11px;
   padding: 5px 10px;
   z-index: 1;
   background: #eee;
   color: #333;
-  margin-left: 5px;
   text-align: center;
   font-weight: bold;
   text-transform: lowercase;
   border-radius: 5px;
 }
 
-.drawer-handle:hover {
-  background: #333;
+.nav .drawer-handle:hover {
+  background: #448ccb;
+  color: #fff;
+}
+
+.nav .active {
+  background: #252525 !important;
   color: #eee;
+}
+
+.nav .active, .nav .drawer-handle:hover {
+  -moz-box-shadow: 0px 0px 3px #fff !important;
+  -webkit-box-shadow: 0px 0px 3px #fff !important;
+  box-shadow: 0px 0px 3px #fff !important;
 }
 
 /* Side Menu */
 
 .side {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   overflow-y: auto;
   background: #fff;
   right: -310px;
@@ -119,7 +131,7 @@ h1, h2, h3 {
 #subreddits li a {
   display: block;
   margin: 2px;
-  background: #464646;
+  background: #555;
   padding: 4px 8px;
   border-radius: 5px;
 }
@@ -129,8 +141,25 @@ h1, h2, h3 {
 }
 
 #subreddits .active {
-  background: #000;
+  background: #000 !important;
 }
+
+#subreddits-controls {
+  margin-bottom: 10px;
+}
+
+#subreddits-controls a {
+  color: #252525;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background: url('../img/close.png') no-repeat center center;
+}
+
+#subreddits-controls .close span {
+  display: none;
+}
+
 
 /* Body */
 
@@ -180,7 +209,6 @@ h1, h2, h3 {
 }
 
 a {
-  color: #fff;
   text-decoration: none;
 }
 
@@ -214,7 +242,7 @@ a {
 }
 
 #links .hover {
-  border: 2px solid #3a87ad;
+  border: 2px solid #448ccb;
 }
 
 #links .selected {
@@ -404,6 +432,8 @@ html, body {
 #guide h2 {
   color: #fff;
   margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
 }
 
 #guide span {
@@ -424,4 +454,15 @@ html, body {
   margin: 3px;
   min-width: 20px;
   border-radius: 2px;
+}
+
+#noty {
+  padding-top: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  position: absolute;
+  text-transform: lowercase;
+  z-index: 2;
+  top: 0px;
 }
