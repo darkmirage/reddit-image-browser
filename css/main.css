@@ -206,7 +206,7 @@ a {
   left: 0;
   width: 70px;
   height: 70px;
-  border: 1px solid #fff;
+  border: 3px solid #fff;
 }
 
 .thumbnail h2 {
@@ -214,11 +214,11 @@ a {
 }
 
 #links .hover {
-  border: 1px solid #3a87ad;
+  border: 2px solid #3a87ad;
 }
 
 #links .selected {
-  border: 1px solid #555 !important;
+  border: 2px solid #555 !important;
 }
 
 /* Individual Post */

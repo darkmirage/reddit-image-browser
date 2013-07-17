@@ -313,14 +313,14 @@ function MainView(config) {
 
     update
       .attr('data-index', function(d, i) { return i; })
-      .style('left', function(d, i) { return (5 + i * 77) + 'px' });
+      .style('left', function(d, i) { return (5 + i * 75) + 'px' });
 
     update.exit()
       .call(that.helpers.hide);
 
     update.enter()
       .append('span')
-      .style('left', function(d, i) { return (5 + i * 77) + 'px' })
+      .style('left', function(d, i) { return (5 + i * 75) + 'px' })
       .html(function(d) { return templates.link({ item: d.data }); })
       .attr('class', 'thumbnail')
       .attr('data-name', function(d, i) { return d.data.name; })
@@ -447,8 +447,12 @@ function MainView(config) {
 
       // Scroll animation
       var duration = i >= 0 ? 0 : 400;
+      container.stop();
       container.animate({ scrollLeft: target }, duration, function() {
-        if (container.scrollLeft() < target && !loading) {
+        var last_index = that.links.length - 1;
+        var last = $('span[data-index=' + last_index + ']');
+        var right_edge = parseInt(last.css('left'), 10) + last.width() + 10;
+        if (container.scrollLeft() + 2 * config.scroll_width > right_edge && !loading) {
           that.more();
         }
 
@@ -472,27 +476,30 @@ function MainView(config) {
       var step = target - curr;
       that.helpers.scroll(step, -1);
     },
+    scrollCheck: function(target) {
+      var pos = parseInt(selected.css('left'), 10)
+      var scroll_pos = container.scrollLeft();
+      if (pos + selected.width() >= scroll_pos + config.scroll_width) {
+        that.helpers.scrollTo(pos - 5);
+        return;
+      }
+
+      if (pos < scroll_pos)
+        that.helpers.scrollTo(pos + selected.width() + 10 - config.scroll_width);
+    },
     selectNext: function() {
       var index = parseInt(selected.attr('data-index')) + 1;
       if (index >= that.links.length)
         return;
       that.select(index);
-
-      var pos = parseInt(selected.css('left'), 10) + selected.width();
-      var scroll_pos = container.scrollLeft() + config.scroll_width;
-      if (pos >= scroll_pos)
-        that.helpers.scrollTo(pos - selected.width() - 5);
+      that.helpers.scrollCheck();
     },
     selectPrev: function() {
       var index = parseInt(selected.attr('data-index')) - 1;
       if (index < 0)
         return;
       that.select(index);
-
-      var pos = parseInt(selected.css('left'), 10);
-      var scroll_pos = container.scrollLeft();
-      if (pos < scroll_pos)
-        that.helpers.scrollTo(pos - config.scroll_width);
+      that.helpers.scrollCheck();
     },
     enableResize: function() {
       $(window).resize(function() { that.resize(true); });
@@ -508,11 +515,13 @@ function MainView(config) {
           that.helpers.scroll(10);
         }, function() { scrolling = false });
       } else {
-        $('#scroll-left').click(function() {
+        $('#scroll-left').click(function(e) {
           that.helpers.scroll(-700, -1);
+          e.preventDefault();
         });
-        $('#scroll-right').click(function() {
+        $('#scroll-right').click(function(e) {
           that.helpers.scroll(700, -1);
+          e.preventDefault();
         });
       }
     },
@@ -619,7 +628,6 @@ $(document).ready(function() {
   readParams();
   loadTemplates();
   window.rib = new RedditImageBrowser();
-  // rib.fetch({ type: 'hot', limit: 4, after: 'test' });
   rib.init();
 
   setTimeout(function() {
