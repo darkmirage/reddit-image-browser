@@ -74,7 +74,7 @@ function RedditImageBrowser(config) {
   rib.config = {};
   rib.config.cage_id = '#ribcage';
   rib.config.sub_id = '#subreddits';
-  rib.config.defaults = ['pics'];
+  rib.config.defaults = ['videos'];
   rib.config.hover_scroll = false;
   rib.config.scroll_width = 860;
 
@@ -277,6 +277,8 @@ function MainView(config) {
   this.display = function(link) {
     var content = $('<div></div>').addClass('shadow');
 
+    console.debug(link);
+
     if (link.type == 'image') {
       var elem = link.img;
       elem.addClass('post-content');
@@ -289,7 +291,10 @@ function MainView(config) {
         .attr('src', link.data.url + '/embed');
       link.iframe = elem;
     }
-    else if (link.type == 'self' || link.type == 'page') {
+    else if (link.type == 'video') {
+      var elem = link.video;
+    }
+    else { //if (link.type == 'self' || link.type == 'page') {
       var elem = $('<div></div>');
       elem
         .addClass('self-post')
@@ -340,6 +345,10 @@ function MainView(config) {
     that.display(elem[0].__data__);
   }
 
+  this.selected = function() {
+    return that.links[selected.attr('data-index')];
+  }
+
   this.format = function() {
     that.links = _.compact(that.links);
     for (var i = 0; i < that.links.length; i++) {
@@ -377,6 +386,11 @@ function MainView(config) {
         d.thumbnail = './img/nsfw.png';
       }
 
+      if (d.media != null) {
+        that.helpers.processVideo(link);
+        link.type = 'video';
+      }
+
       if (link.type === undefined) {
         link.type = 'page';
       }
@@ -389,7 +403,7 @@ function MainView(config) {
   var resizeTimer;
   this.resize = function(animate) {
     var doResize = function() {
-      var cur = $('#post .post-content');
+      var curr = $('#post .post-content');
       var height = 0;
       height += $('#header').height();
       height += $('#links').height();
@@ -398,11 +412,19 @@ function MainView(config) {
       // Kind of hacky since I'm accounting for margins manually
       height = $(window).height() - height - 80;
 
-      cur.css('max-height', cur.height() + 'px');
+      var params = { 'max-height': height + 'px'};
+
+      ratio = selected.attr('data-ratio');
+
+      if (that.selected().ratio > 0)
+        params['max-width'] = that.selected().ratio * height;
+
+      // curr.css('max-height', curr.height() + 'px');
+      curr.stop();
       if (animate)
-        cur.animate({ 'max-height': height + 'px'}, 500);
+        curr.animate(params, 500);
       else
-        cur.css('max-height', height + 'px');
+        curr.css(params);
     }
 
     if (animate) {
@@ -551,11 +573,11 @@ function MainView(config) {
           case 118:
           case 86:
           case 13:
-            window.open(that.links[selected.attr('data-index')].data.url, '_blank');
+            window.open(that.selected().data.url, '_blank');
             break;
           case 99:
           case 67:
-            var permalink = that.links[selected.attr('data-index')].data.permalink;
+            var permalink = that.selected().data.permalink;
             window.open('http://www.reddit.com' + permalink, '_blank');
             break;
         }
@@ -594,7 +616,28 @@ function MainView(config) {
           that.helpers.hideLoading('bar');
         });
       }
-    }
+    },
+    processVideo: function(link) {
+      var elem = $('<div></div>');
+      elem.html(that.helpers.htmlUnescape(link.data.media_embed.content));
+      var frame = elem.find('iframe')
+      // Preserve aspect ratio for video iframes
+      var ratio = frame.attr('width') / frame.attr('height');
+      frame
+        .addClass('video post-content')
+        .removeAttr('width')
+        .removeAttr('height');
+      link.video = frame;
+      link.ratio = ratio;
+    },
+    htmlUnescape: function(value){
+        return String(value)
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&amp;/g, '&');
+      }
   }
 
   // Implements fetching in this module
