@@ -249,6 +249,7 @@ a {
 #post iframe {
   width: 860px;
   height: 600px;
+  display: block;
 }
 
 #post .self-post {

@@ -81,10 +81,10 @@ function RedditImageBrowser(config) {
   // Configuration parser
   rib.set = function(config) {
     if (config !== undefined) {
-      if (config.cage_id !== undefined)
-        rib.config.cage_id = config.cage_id;
+      for (var key in config) {
+        rib.config[key] = config[key];
+      }
     }
-
     rib.cage = $(rib.config.cage_id);
   }
 
@@ -277,8 +277,6 @@ function MainView(config) {
   this.display = function(link) {
     var content = $('<div></div>').addClass('shadow');
 
-    console.debug(link);
-
     if (link.type == 'image') {
       var elem = link.img;
       elem.addClass('post-content');
@@ -340,9 +338,8 @@ function MainView(config) {
     var elem = $('span[data-index=' + index + ']');
     elem.addClass('selected');
     selected = elem;
-
-    // Kind of hacky? Couldn't get d3 selects to work for [data-index=]
-    that.display(elem[0].__data__);
+    that.display(that.links[index]);
+    that.helpers.scrollCheck();
   }
 
   this.selected = function() {
@@ -559,8 +556,8 @@ function MainView(config) {
       });
     },
     enableKeyboard: function() {
-
       var keyHandler = function(e) {
+        var d = that.selected().data;
         switch (e.which) {
           case 106:
           case 74:
@@ -573,12 +570,15 @@ function MainView(config) {
           case 118:
           case 86:
           case 13:
-            window.open(that.selected().data.url, '_blank');
+            window.open(d.data.url, '_blank');
             break;
           case 99:
           case 67:
-            var permalink = that.selected().data.permalink;
-            window.open('http://www.reddit.com' + permalink, '_blank');
+            window.open('http://www.reddit.com' + d.permalink, '_blank');
+            break;
+          case 114:
+          case 82:
+            window.open('http://www.reddit.com/r/' + d.data.subreddit, '_blank');
             break;
         }
       }
