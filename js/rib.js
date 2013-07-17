@@ -396,6 +396,9 @@ function MainView(config) {
     content.attr('id', link.data.name);
     content.append(elem);
 
+    // if (link.type == 'album')
+    //   content.append('<div class="imgur-note">You can browse Imgur albums with your arrow keys</div>')
+
     meta.html(templates.meta({ item: link.data }));
 
     curr.append(content);

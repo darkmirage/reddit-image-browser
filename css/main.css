@@ -1,8 +1,8 @@
 /* Reddit Image Browser */
 
 * {
-  box-sizing: border-box;
   -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body, div, ul, h1, h2 {
@@ -19,16 +19,16 @@ ol, ul {
 }
 
 body {
-  font-family: 'Verdana', 'Tahoma', 'Arial', sans-serif;
-  background: #dfdfdf;
   overflow-x: hidden;
+  background: #dfdfdf;
+  font-family: 'Verdana', 'Tahoma', 'Arial', sans-serif;
 }
 
 sup {
-  line-height: 0;
   margin-right: 3px;
-  font-weight: bold;
   color: #555;
+  font-weight: bold;
+  line-height: 0;
 }
 
 #container {
@@ -36,7 +36,7 @@ sup {
 }
 
 h1, h2, h3 {
-  color: #252525
+  color: #252525;
 }
 
 /* Header */
@@ -47,10 +47,10 @@ h1, h2, h3 {
 }
 
 #header .content {
+  overflow: hidden;
+  margin: 0 auto;
   width: 900px;
   height: 40px;
-  margin: 0 auto;
-  overflow: hidden;
 }
 
 #header h1 {
@@ -66,9 +66,9 @@ h1, h2, h3 {
 }
 
 #header h2 {
+  float: left;
   margin-top: 15px;
   color: #aaa;
-  float: left;
   font-size: 0.8em;
 }
 
@@ -77,31 +77,31 @@ h1, h2, h3 {
 }
 
 #header .nav {
-  padding-right: 5px;
-  padding-top: 6px;
   display: block;
   float: right;
+  padding-top: 6px;
+  padding-right: 5px;
   height: 100%;
 }
 
 .nav .drawer-handle {
-  display: inline-block;
   position: relative;
-  padding: 5px 10px;
   z-index: 4;
+  display: inline-block;
+  overflow: hidden;
+  padding: 5px 10px;
+  border-radius: 5px;
   background-color: #eee;
   color: #333;
   text-align: center;
-  font-weight: bold;
   text-transform: lowercase;
-  border-radius: 5px;
-  overflow: hidden;
+  font-weight: bold;
 }
 
 .nav .drawer-handle:hover {
+  z-index: 6;
   background: #448ccb;
   color: #fff;
-  z-index: 6;
 }
 
 .nav .drawer-handle:hover span {
@@ -126,8 +126,8 @@ h1, h2, h3 {
 }
 
 .nav .active, .nav .drawer-handle:hover {
-  -moz-box-shadow: 0px 0px 3px #fff !important;
   -webkit-box-shadow: 0px 0px 3px #fff !important;
+  -moz-box-shadow: 0px 0px 3px #fff !important;
   box-shadow: 0px 0px 3px #fff !important;
 }
 
@@ -139,18 +139,18 @@ h1, h2, h3 {
 
 .side {
   position: absolute;
+  top: 0;
+  right: -310px;
   z-index: 20;
   overflow-y: auto;
-  background: #fff;
-  right: -310px;
-  top: 0;
+  margin: 0 !important;
   padding: 10px;
   padding-right: 20px;
-  width: 300px;
-  max-height: 100%;
   min-height: 200px;
-  margin: 0 !important;
+  max-height: 100%;
+  width: 300px;
   border-radius: 10px;
+  background: #fff;
 }
 
 #subreddits {
@@ -164,10 +164,10 @@ h1, h2, h3 {
 #subreddits li a {
   display: block;
   margin: 2px;
-  color: #fff;
-  background: #555;
   padding: 4px 8px;
   border-radius: 5px;
+  background: #555;
+  color: #fff;
 }
 
 #subreddits li a:hover {
@@ -183,11 +183,11 @@ h1, h2, h3 {
 }
 
 #subreddits-controls a {
-  color: #252525;
   display: inline-block;
   width: 30px;
   height: 30px;
   background: url('../img/close.png') no-repeat center center;
+  color: #252525;
 }
 
 #subreddits-controls .close span {
@@ -199,15 +199,15 @@ h1, h2, h3 {
 
 #loading {
   position: absolute;
-  background: #333;
-  color: #fff;
-  z-index: 4;
   top: 5px;
   right: 20px;
+  z-index: 4;
   padding: 5px;
+  border-radius: 3px;
+  background: #333;
+  color: #fff;
   text-transform: lowercase;
   font-size: 12px;
-  border-radius: 3px;
 }
 
 #loading span {
@@ -217,10 +217,10 @@ h1, h2, h3 {
 
 .scroll {
   position: absolute;
+  top: 10px;
   z-index: 1;
   width: 20px;
   height: 80px;
-  top: 10px;
   cursor: pointer;
 }
 
@@ -238,8 +238,8 @@ h1, h2, h3 {
   position: relative;
   overflow: hidden;
   margin: auto;
-  text-align: left;
   width: 900px;
+  text-align: left;
 }
 
 a {
@@ -248,12 +248,12 @@ a {
 
 #links {
   position: relative;
-  overflow: hidden;
   clear: both;
-  white-space: nowrap;
+  overflow: hidden;
+  padding: 5px;
   width: 100%;
   height: 82px;
-  padding: 5px;
+  white-space: nowrap;
 }
 
 #links span:hover {
@@ -261,14 +261,14 @@ a {
 }
 
 .thumbnail {
-  overflow: hidden;
-  display: inline-block;
-  background-color: #eee;
   position: absolute;
   left: 0;
+  display: inline-block;
+  overflow: hidden;
   width: 70px;
   height: 70px;
   border: 3px solid #fff;
+  background-color: #eee;
 }
 
 .thumbnail h2 {
@@ -286,22 +286,22 @@ a {
 /* Individual Post */
 
 #post {
-  min-height: 200px;
-  min-width: 200px;
-  padding-bottom: 5px;
-  text-align: center;
   position: relative;
+  padding-bottom: 5px;
+  min-width: 200px;
+  min-height: 200px;
+  text-align: center;
 }
 
 #post img {
-  max-width: 860px;
   display: block;
+  max-width: 860px;
 }
 
 #post div {
   position: relative;
-  margin: 0 auto;
   display: inline-block;
+  margin: 0 auto;
 }
 
 #post a {
@@ -309,28 +309,28 @@ a {
 }
 
 #post iframe {
+  display: block;
   width: 860px;
   height: 600px;
-  display: block;
 }
 
 #post .self-post {
+  overflow: auto;
   padding: 20px;
   max-width: 640px;
   background: #fff;
   text-align: left;
   line-height: 25px;
-  overflow: auto;
 }
 
 #post .self-post a {
-  font-style: italic;
   color: #555;
+  font-style: italic;
 }
 
 .box {
-  background: #fff;
   overflow: hidden;
+  background: #fff;
 }
 
 .pad {
@@ -339,58 +339,67 @@ a {
 
 .shadow {
   overflow: hidden;
-  -moz-box-shadow: 0px 0px 3px #999 !important;
   -webkit-box-shadow: 0px 0px 3px #999 !important;
+  -moz-box-shadow: 0px 0px 3px #999 !important;
   box-shadow: 0px 0px 3px #999 !important;
 }
 
 #post .empty-content {
-  font-size: 12px;
-  text-align: center;
-  background: url('../img/open.png') no-repeat center 20px;
-  display: block;
   position: relative;
+  display: block;
+  overflow: hidden;
   width: 250px;
   height: 200px;
-  overflow: hidden;
+  background: url('../img/open.png') no-repeat center 20px;
+  text-align: center;
   font-style: normal !important;
+  font-size: 12px;
 }
 
 #post .empty-content span {
   display: block;
-  font-size: 20px;
   font-weight: bold;
+  font-size: 20px;
 }
 
 #post .empty-content em {
-  font-style: normal;
   font-weight: bold;
+  font-style: normal;
 }
 
 #post .empty-content:hover {
   color: #000;
 }
 
+#post .imgur-note {
+  padding: 10px;
+  width: 100%;
+  background: #121212;
+  color: #eee;
+  text-transform: lowercase;
+  font-size: 12px;
+}
+
 /* Post Meta */
 
 #post-meta {
-  padding: 0 20px;
   position: relative;
   overflow: hidden;
   margin-bottom: 10px;
+  padding: 0 20px;
 }
 
 #post-meta h3 {
-  font-size: 15px;
-  font-weight: bold;
-  padding: 5px;
   float: left;
+  padding: 5px;
   max-width: 640px;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 #post-meta h3, #post-meta div {
-  padding: 5px;
   margin: 0;
+  padding: 5px;
 }
 
 .meta-ups, .meta-downs {
@@ -398,27 +407,27 @@ a {
 }
 
 .meta-ups:after {
-  content: '\25B2';
   color: rgb(255, 139, 36);
+  content: '\25B2';
 }
 
 .meta-downs:after {
-  content: '\25BC';
   color: rgb(148, 148, 255);
+  content: '\25BC';
 }
 
 .meta-score {
   padding-right: 20px;
-  font-size: 15px;
-  font-weight: bold;
   color: #252525;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 #post-meta div {
-  color: #555;
-  max-width: 200px;
-  font-size: 10px;
   float: right;
+  max-width: 200px;
+  color: #555;
+  font-size: 10px;
 }
 
 #post-meta a {
@@ -436,121 +445,121 @@ html, body {
 }
 
 #footer {
-  display: none;
-  background: #252525;
   position: relative;
-  margin-top: -40px;
+  display: none;
   clear: both;
+  margin-top: -40px;
   height: 40px;
+  background: #252525;
 }
 
 /* Guide */
 
 #guide {
-  color: #fff;
-  display: none;
-  top: 200px;
   position: absolute;
+  top: 200px;
   z-index: 10;
-  max-width: 600px;
-  min-height: 300px;
-  background: #252525;
-  opacity: 0.95;
+  display: none;
   padding: 30px;
-  -moz-box-shadow: 0px 0px 5px #333 !important;
-  -webkit-box-shadow: 0px 0px 5px #333 !important;
-  box-shadow: 0px 0px 5px #333 !important;
+  min-height: 300px;
+  max-width: 600px;
   border-radius: 5px;
+  background: #252525;
+  -webkit-box-shadow: 0px 0px 5px #333 !important;
+  -moz-box-shadow: 0px 0px 5px #333 !important;
+  box-shadow: 0px 0px 5px #333 !important;
+  color: #fff;
+  opacity: 0.95;
 }
 
 #guide h2 {
-  color: #fff;
   margin-bottom: 20px;
+  color: #fff;
   text-align: center;
   font-weight: bold;
 }
 
 #guide span {
-  text-align: right;
-  padding-right: 20px;
   display: inline-block;
+  padding-right: 20px;
   min-width: 120px;
+  text-align: right;
 }
 
 #guide em {
-  text-align: center;
-  font-weight: bold;
-  padding: 3px;
-  background: #eee;
-  color: #252525;
   display: inline-block;
-  font-style: normal;
   margin: 3px;
+  padding: 3px;
   min-width: 20px;
   border-radius: 2px;
+  background: #eee;
+  color: #252525;
+  text-align: center;
+  font-weight: bold;
+  font-style: normal;
 }
 
 #noty {
+  position: absolute;
+  top: 0px;
+  z-index: 6;
   padding-top: 10px;
   width: 100%;
   text-align: center;
-  font-size: 12px;
-  position: absolute;
   text-transform: lowercase;
-  z-index: 6;
-  top: 0px;
+  font-size: 12px;
 }
 
 /* FAQ */
 
 #dark, .page {
+  top: 0;
+  right: 0;
+  left: 0;
   display: none;
   width: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
   cursor: pointer;
 }
 
 #dark {
   position: fixed;
+  bottom: 0;
+  z-index: 4;
   height: 100%;
   background: #252525;
   background: rgba(37, 37, 37, 0.5);
-  z-index: 4;
-  bottom: 0;
 }
 
 .page {
-  display: none;
   position: absolute;
-  text-align: center;
   z-index: 5;
+  display: none;
+  text-align: center;
 }
 
 .page-content {
-  font-size: 12px;
-  margin: 0 auto;
-  display: inline-block;
-  text-align: left;
   position: relative;
   top: 50px;
-  max-width: 640px;
+  display: inline-block;
   overflow: auto;
+  margin: 0 auto;
+  max-width: 640px;
   border-radius: 15px;
+  text-align: left;
+  font-size: 12px;
   cursor: auto;
 }
 
 .page-content div {
+  padding: 20px;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  padding: 20px;
 }
 
 .page h2 {
   display: block;
-  font-size: 20px !important;
   font-weight: bold;
+  font-size: 20px !important;
 }
 
 .page h3, .page p {
@@ -576,9 +585,9 @@ html, body {
 
 .page ul, .page h2 {
   padding-top: 10px;
-  padding-left: 20px;
   padding-bottom: 10px;
-  font-size: 10px;
-  color: #ddd;
+  padding-left: 20px;
   background: #252525;
+  color: #ddd;
+  font-size: 10px;
 }
