@@ -24,6 +24,11 @@ body {
   overflow-x: hidden;
 }
 
+sup {
+  line-height: 0;
+  margin-right: 3px;
+}
+
 #container {
   text-align: center;
 }

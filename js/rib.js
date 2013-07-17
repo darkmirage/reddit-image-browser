@@ -282,7 +282,6 @@ function MainView(config) {
 
   this.subs = config.defaults.slice(0);
   this.links = [];
-  this.urls = [];
   var after = null;
   var limit = 30;
 
@@ -350,15 +349,21 @@ function MainView(config) {
 
   this.reset = function(callback) {
     that.links = [];
-    that.urls = [];
     after = null;
     limit = 30;
     that.helpers.scrollHome();
-    that.more(function(json) {
+
+    var succuess = that.more(function(json) {
       that.select(0);
       if (callback !== undefined)
         callback(json);
     });
+
+    if (!succuess) {
+      setTimeout(function() {
+        this.reset(callback);
+      }, 100);
+    }
   }
 
   // Display the selected item
