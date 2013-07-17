@@ -591,6 +591,12 @@ function MainView(config) {
       var step = target - curr;
       that.helpers.scroll(step, -1);
     },
+    scrollNextPage: function() {
+      that.helpers.scroll(config.scroll_width - 100, -1);
+    },
+    scrollPrevPage: function() {
+      that.helpers.scroll(-(config.scroll_width - 100), -1);
+    },
     scrollCheck: function(target) {
       var pos = parseInt(selected.css('left'), 10)
       var scroll_pos = container.scrollLeft();
@@ -631,11 +637,11 @@ function MainView(config) {
         }, function() { scrolling = false });
       } else {
         $('#scroll-left').click(function(e) {
-          that.helpers.scroll(-700, -1);
+          that.helpers.scrollPrevPage();
           e.preventDefault();
         });
         $('#scroll-right').click(function(e) {
-          that.helpers.scroll(700, -1);
+          that.helpers.scrollNextPage();
           e.preventDefault();
         });
       }
