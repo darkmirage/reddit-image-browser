@@ -281,11 +281,16 @@ function RedditImageBrowser(config) {
     /* Trigger their respective buttons to close overlays. Kind of dumb but
        it works since I neglected to write externally-accessible functions
        for closing the popups... */
-    $('#dark, .page').click(function() {
+    var hideAll = function() {
       if (toggleFAQ)
         $('a[data-name=faq]').trigger('click');
       if (toggleSub)
         $('a[data-name=subreddits]').trigger('click');
+    }
+    $('#dark, .page').click(hideAll);
+    $(document).on('keydown', function(e) {
+      console.debug(e);
+      if (e.which == 27) hideAll();
     });
     $('#faq .page-content').click(function(e) { e.stopPropagation(); });
   }
