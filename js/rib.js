@@ -45,6 +45,7 @@ function fetcher(args, callback) {
   });
 }
 
+// Might use this someday...
 var params = {};
 function readParams() {
   var query = window.location.search;
@@ -289,7 +290,6 @@ function RedditImageBrowser(config) {
     }
     $('#dark, .page').click(hideAll);
     $(document).on('keydown', function(e) {
-      console.debug(e);
       if (e.which == 27) hideAll();
     });
     $('#faq .page-content').click(function(e) { e.stopPropagation(); });
@@ -703,13 +703,13 @@ function MainView(config) {
           return;
         var d = that.selected().data;
         switch (e.which) {
-          // j - prev
+          // j - next
           case 106: case 74:
-            that.helpers.selectPrev();
-            break;
-          // k - next
-          case 107: case 75:
             that.helpers.selectNext();
+            break;
+          // k - prev
+          case 107: case 75:
+            that.helpers.selectPrev();
             break;
           // v, enter - open link
           case 118: case 86: case 13:

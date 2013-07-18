@@ -510,9 +510,10 @@ html, body {
 
 #guide span {
   display: inline-block;
+  margin: 3px;
   padding-right: 20px;
   min-width: 120px;
-  text-align: right;
+  text-align: center;
 }
 
 #guide em {
