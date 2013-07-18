@@ -25,9 +25,10 @@ There is currently no support for mobile devices.
 - Data visualization (e.g. treemaps) using D3.js.
 - Implement YouTube API callback function to allow better video controls.
 - Load top comments on demand.
+- Make keyboard shortcut work for Imgur albums.
 - Option to filter by post type.
 - Zoom and resize options.
-- Responsive layout.
+- Responsive layout. (Probably not...)
 - Mobile support?
 
 ## Contact
