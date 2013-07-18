@@ -32,7 +32,7 @@ function fetcher(args, callback) {
     jsonp: 'jsonp',
     success: function(reponse) {
       console.log('Fetched: ' + full_url);
-      console.debug(reponse);
+      console.log(reponse);
       callback(reponse, full_url);
     },
     error: function (xhr, ajaxOptions, thrownError) {
@@ -59,25 +59,25 @@ function readParams() {
   }
 
   console.log('Parameters parsed');
-  console.debug(params);
+  console.log(params);
 }
 
 // Cookieeeees. But really HTML5 storage.
 var cookies = {
   supports_html5_storage: function() {
     try {
-      return 'localStorage' in window && window['localStorage'] !== null;
+      return 'localStorage' in window && window['localStorage'] !== null && window['localStorage'] !== undefined;
     } catch (e) {
       return false;
     }
   },
   get: function(name) {
-    if (this.supports_html5_storage())
-      return localStorage[name];
+    if (cookies.supports_html5_storage())
+      return localStorage.getItem(name);
     return false;
   },
   set: function(name, value) {
-    if (this.supports_html5_storage()) {
+    if (cookies.supports_html5_storage()) {
       localStorage[name] = value.join('|');
       return true;
     }
