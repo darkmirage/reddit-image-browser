@@ -24,6 +24,7 @@ function fetcher(args, callback) {
 
   console.log('Request: ' + full_url);
 
+  var retries = 0;
   $.ajax({
     type: 'GET',
     data: params,
@@ -37,8 +38,11 @@ function fetcher(args, callback) {
     },
     error: function (xhr, ajaxOptions, thrownError) {
       console.log(thrownError);
+      if (xhr.status == 404 || retries > 10)
+        return;
       console.log('Retrying...');
       setTimeout(function() {
+        retries++;
         fetcher(args, callback);
       }, 600);
     }
@@ -74,7 +78,7 @@ var cookies = {
   get: function(name) {
     if (cookies.supports_html5_storage()) {
       var val = localStorage.getItem(name);
-      return val ? localStorage.getItem(name).split('|') : false;
+      return val !== undefined ? localStorage.getItem(name).split('|') : false;
     }
     return false;
   },
@@ -205,9 +209,11 @@ function RedditImageBrowser(config) {
       .keypress(function(e) {
         if (e.which == 13) {
           e.preventDefault();
-          rib.fetchSubreddit(input.val());
+          if (input.val() != '')
+            rib.fetchSubreddit(input.val());
           input.val('');
           input.blur();
+          $('#dark').trigger('click');
         }
       });
 
@@ -251,6 +257,7 @@ function RedditImageBrowser(config) {
       var hide = function() {
         subParent.animate({'right': '-310px'}, 500);
         handle.removeClass('active');
+        subParent.find('input').blur();
         toggleSub = false;
         $('#dark').fadeOut(500);
       };
