@@ -72,8 +72,10 @@ var cookies = {
     }
   },
   get: function(name) {
-    if (cookies.supports_html5_storage())
-      return localStorage.getItem(name);
+    if (cookies.supports_html5_storage()) {
+      var val = localStorage.getItem(name);
+      return val ? localStorage.getItem(name).split('|') : false;
+    }
     return false;
   },
   set: function(name, value) {
@@ -121,7 +123,7 @@ function RedditImageBrowser(config) {
     rib.subview = $(rib.config.sub_id)
 
     var subs = cookies.get('subreddits');
-    if (subs) rib.config.defaults = subs.split('|');
+    if (subs) rib.config.defaults = subs;
   }
 
   // Parse configurations
