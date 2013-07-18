@@ -627,3 +627,26 @@ html, body {
   color: #ddd;
   font-size: 10px;
 }
+
+/* First time */
+
+#first {
+  position: absolute;
+  top: 0;
+  text-align: center;
+  padding-top: 300px;
+  width: 100%;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  z-index: 10;
+  text-transform: lowercase;
+  font-family: 'Raleway';
+  background: rgba(37, 37, 37, 0.7);
+  height: 100%;
+  display: none;
+}
+
+#first span {
+  display: inline-block;
+}

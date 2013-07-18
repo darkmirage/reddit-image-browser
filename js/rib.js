@@ -124,6 +124,7 @@ function RedditImageBrowser(config) {
 
     var subs = cookies.get('subreddits');
     if (subs) rib.config.defaults = subs;
+    else rib.config.first = true;
   }
 
   // Parse configurations
@@ -336,6 +337,11 @@ function RedditImageBrowser(config) {
     });
 
     rib.initSubreddits();
+
+    if (rib.config.first) {
+      $('#first').show();
+      $(document).keypress(function() { $('#first').hide(); });
+    }
   }
 }
 
