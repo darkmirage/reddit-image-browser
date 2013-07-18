@@ -78,7 +78,7 @@ var cookies = {
   get: function(name) {
     if (cookies.supports_html5_storage()) {
       var val = localStorage.getItem(name);
-      return val !== undefined ? localStorage.getItem(name).split('|') : false;
+      return val === undefined || !val || val == null ? false : localStorage.getItem(name).split('|');
     }
     return false;
   },
