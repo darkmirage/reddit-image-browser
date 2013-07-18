@@ -62,6 +62,29 @@ function readParams() {
   console.debug(params);
 }
 
+// Cookieeeees. But really HTML5 storage.
+var cookies = {
+  supports_html5_storage: function() {
+    try {
+      return 'localStorage' in window && window['localStorage'] !== null;
+    } catch (e) {
+      return false;
+    }
+  },
+  get: function(name) {
+    if (this.supports_html5_storage())
+      return localStorage[name];
+    return false;
+  },
+  set: function(name, value) {
+    if (this.supports_html5_storage()) {
+      localStorage[name] = value.join('|');
+      return true;
+    }
+    return false;
+  }
+}
+
 // Underscore.js templates
 var templates = {};
 function loadTemplates() {
@@ -96,6 +119,9 @@ function RedditImageBrowser(config) {
     }
     rib.cage = $(rib.config.cage_id);
     rib.subview = $(rib.config.sub_id)
+
+    var subs = cookies.get('subreddits');
+    if (subs) rib.config.defaults = subs.split('|');
   }
 
   // Parse configurations
@@ -182,11 +208,11 @@ function RedditImageBrowser(config) {
         }
       });
 
-    add
-      .click(function() {
+    add.click(function(e) {
         add.hide();
         form.show();
         input.focus();
+        e.preventDefault();
       })
 
     var subs = rib.config.defaults;
@@ -249,7 +275,7 @@ function RedditImageBrowser(config) {
         if (toggleFAQ) return;
         guide.fadeOut(300);
         $('#dark').fadeOut(0);
-      });
+      }).click(function(e) { e.preventDefault(); });
     }
 
     var enableFAQ = function(handle) {
@@ -346,6 +372,7 @@ function MainView(config) {
     that.subs.push(entry);
     limit += 10;
     that.reset();
+    cookies.set('subreddits', that.subs);
   }
 
   // These operate on the retrieved links
@@ -385,6 +412,7 @@ function MainView(config) {
   }
 
   this.reset = function(callback) {
+    cookies.set('subreddits', that.subs);
     that.links = [];
     after = null;
     limit = 30;
@@ -398,7 +426,7 @@ function MainView(config) {
 
     if (!succuess) {
       setTimeout(function() {
-        this.reset(callback);
+        that.reset(callback);
       }, 100);
     }
   }
