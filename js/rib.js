@@ -30,10 +30,17 @@ function fetcher(args, callback) {
     dataType: 'jsonp',
     url: url,
     jsonp: 'jsonp',
-    success: function(json) {
+    success: function(reponse) {
       console.log('Fetched: ' + full_url);
-      console.debug(json);
-      callback(json, full_url);
+      console.debug(reponse);
+      callback(reponse, full_url);
+    },
+    error: function (xhr, ajaxOptions, thrownError) {
+      console.log(thrownError);
+      console.log('Retrying...');
+      setTimeout(function() {
+        fetcher(args, callback);
+      }, 600);
     }
   });
 }
@@ -149,7 +156,38 @@ function RedditImageBrowser(config) {
     });
   }
 
-  rib.displayDefaults = function() {
+  rib.fetchSubreddit = function(name, callback) {
+      rib.fetch({ type: 'r', name: name + '/about' }, function(json) {
+        rib.addSubreddit(json);
+        rib.add(json.data.display_name);
+        if (callback !== undefined)
+          callback(json);
+      });
+  }
+
+  rib.initSubreddits = function() {
+    var form = $('#subreddits-add').hide();
+    var input = form.find('input');
+    var add = $('#subreddits-controls .add');
+    input
+      .focus(function() { input.val(''); })
+      .blur(function() { form.hide(); add.show(); })
+      .keypress(function(e) {
+        if (e.which == 13) {
+          e.preventDefault();
+          rib.fetchSubreddit(input.val());
+          input.val('');
+          input.blur();
+        }
+      });
+
+    add
+      .click(function() {
+        add.hide();
+        form.show();
+        input.focus();
+      })
+
     var subs = rib.config.defaults;
     var remain = subs.length;
     if (remain == 0) {
@@ -158,9 +196,7 @@ function RedditImageBrowser(config) {
     }
 
     for (var i = 0; i < subs.length; i++) {
-      rib.fetch({ type: 'r', name: subs[i] + '/about' }, function(json) {
-        rib.addSubreddit(json);
-        rib.add(json.data.display_name);
+      rib.fetchSubreddit(subs[i], function() {
         remain--;
         if (remain == 0) {
           rib.displayHot();
@@ -195,7 +231,7 @@ function RedditImageBrowser(config) {
         e.preventDefault();
       });
 
-      rib.subview.parent().find('.close').on('click', hide);
+      rib.subview.parent().find('.close').hide().on('click', hide);
     }
 
     var enableGuide = function(handle) {
@@ -266,7 +302,7 @@ function RedditImageBrowser(config) {
       return false;
     });
 
-    rib.displayDefaults();
+    rib.initSubreddits();
   }
 }
 
@@ -658,6 +694,8 @@ function MainView(config) {
     },
     enableKeyboard: function() {
       var keyHandler = function(e) {
+        if (e.target.nodeName == 'INPUT')
+          return;
         var d = that.selected().data;
         switch (e.which) {
           // j - prev

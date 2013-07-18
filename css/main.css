@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-body, div, ul, h1, h2 {
+body, div, ul, h1, h2, form, input {
   margin: 0;
   padding: 0;
   border: 0;
@@ -179,21 +179,50 @@ h1, h2, h3 {
 }
 
 #subreddits-controls {
-  margin-bottom: 10px;
+  overflow: hidden;
 }
 
 #subreddits-controls a {
-  display: inline-block;
+  display: block;
+  float: left;
+  margin-right: 5px;
+  margin-left: 5px;
   width: 30px;
   height: 30px;
-  background: url('../img/close.png') no-repeat center center;
   color: #252525;
 }
+#subreddits-controls .close {
+  background: url('../img/close.png') no-repeat center center;
+}
 
-#subreddits-controls .close span {
+#subreddits-controls .add {
+  background: url('../img/add.png') no-repeat center center;
+}
+
+#subreddits-controls .close span, #subreddits-controls .add span {
   display: none;
 }
 
+#subreddits-add {
+  float: left;
+  margin-bottom: 8px;
+}
+
+#subreddits-add input {
+  height: 30px;
+  width: 180px;
+  background-color: #fff;
+  border-radius: 5px;
+  outline-color: #448ccb;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#subreddits-add div {
+  text-transform: lowercase;
+  font-size: 11px;
+  padding-bottom: 5px;
+}
 
 /* Body */
 
