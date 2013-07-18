@@ -69,6 +69,7 @@ function loadTemplates() {
 function RedditImageBrowser(config) {
   console.log('Initializing RIB');
   var rib = this; // Humor me
+  rib.subreddits = [];
 
   // Configurations
   rib.config = {};
@@ -92,43 +93,6 @@ function RedditImageBrowser(config) {
   // Parse configurations
   rib.set(config);
 
-  // Default callback to parse returned JSON
-  rib.parse = function(json) {
-    if (json.kind != 'Listing')
-      return;
-
-    // Reddit API object type
-    var type_prefix = json.data.after.substr(0, 2);
-    var list = json.data.children;
-
-    // On hindsight, I did not need to make a general parser...
-    switch (type_prefix) {
-      case 't1':
-        // Comment
-        break;
-      case 't2':
-        // Account
-        break;
-      case 't3':
-        // Link
-        rib.links.parse(list);
-        break;
-      case 't4':
-        // Message
-        break;
-      case 't5':
-        // Subreddit
-        rib.subreddits.parse(list);
-        break;
-      case 't6':
-        // Award
-        break;
-      case 't8':
-        // PromoCampaign
-        break;
-    }
-  }
-
   // Implments fetching in this module
   rib.fetch = function(args, callback) {
     if (callback === undefined)
@@ -136,32 +100,73 @@ function RedditImageBrowser(config) {
     fetcher(args, callback);
   }
 
-  rib.add = function(subreddit) {
-    rib.main.add(subreddit);
+  rib.add = function(name) {
+    $('a[data-name=' + name + ']').addClass('active');
+    rib.main.add(name);
   }
 
-  rib.remove = function(subreddit) {
-    rib.main.remove(subreddit);
+  rib.remove = function(name) {
+    $('a[data-name=' + name + ']').removeClass('active');
+    rib.main.remove(name);
   }
 
-  rib.enableSubreddits = function() {
-    rib.subview.find('a').on('click', function() {
+  rib.enableSubreddits = function(elem) {
+    if (elem === undefined)
+      elem = rib.subview;
+    elem.find('a').on('click', function() {
     if ($(this).hasClass('active'))
       rib.remove($(this).attr('data-name'));
     else
       rib.add($(this).attr('data-name'));
-    $(this).toggleClass('active');
     });
   }
 
-  rib.addSubreddit = function(name) {
-    var item = {}
-    item.display_name = name;
-    var elem = $(templates.subreddit({ item: item }));
-    elem.find('a').addClass('active');
+  rib.displaySubreddit = function(json) {
+    var elem = $(templates.subreddit({ item: json.data }));
     $(rib.config.sub_id).append(elem);
-    rib.enableSubreddits();
-    rib.add(name);
+    rib.enableSubreddits(elem);
+    elem.hide();
+    elem.fadeIn(500);
+  }
+
+  rib.addSubreddits = function(json) {
+    var list = json.data.children;
+    for (var i = 0; i < list.length; i++) {
+      rib.addSubreddit(list[i]);
+    }
+  }
+
+  rib.addSubreddit = function(json) {
+    if (_.indexOf(rib.subreddits, json.data.display_name) == -1) {
+      rib.subreddits.push(json.data.display_name);
+      rib.displaySubreddit(json);
+    }
+  }
+
+  rib.displayHot = function() {
+    rib.fetch({ type: 'subreddits', name: 'popular' }, function(json) {
+      rib.addSubreddits(json);
+    });
+  }
+
+  rib.displayDefaults = function() {
+    var subs = rib.config.defaults;
+    var remain = subs.length;
+    if (remain == 0) {
+      rib.displayHot();
+      return;
+    }
+
+    for (var i = 0; i < subs.length; i++) {
+      rib.fetch({ type: 'r', name: subs[i] + '/about' }, function(json) {
+        rib.addSubreddit(json);
+        rib.add(json.data.display_name);
+        remain--;
+        if (remain == 0) {
+          rib.displayHot();
+        }
+      });
+    }
   }
 
   rib.enableHandles = function() {
@@ -250,8 +255,6 @@ function RedditImageBrowser(config) {
   }
 
   rib.init = function() {
-    // Subreddit selection
-    rib.subreddits = new ItemList(rib.subview, templates.subreddit);
     // Initialize main view
     rib.main = new MainView(rib.config);
 
@@ -263,16 +266,7 @@ function RedditImageBrowser(config) {
       return false;
     });
 
-    // Fetch subreddit selections
-    rib.fetch({ type: 'subreddits', name: 'popular' }, function(json) {
-      rib.parse(json);
-
-      // Initialize default selection of subs
-      for (var i = 0; i < rib.main.subs.length; i++) {
-        $('a[data-name=' + rib.main.subs[i] + ']').addClass('active');
-      }
-      rib.enableSubreddits();
-    });
+    rib.displayDefaults();
   }
 }
 
@@ -306,6 +300,8 @@ function MainView(config) {
   }
 
   this.add = function(entry) {
+    if (_.indexOf(that.subs, entry) != -1)
+      return;
     that.subs.push(entry);
     limit += 10;
     that.reset();
@@ -773,33 +769,11 @@ function MainView(config) {
   this.fetch = fetcher;
 
   this.helpers.enableScroll();
-
-  // Enable resize
   this.helpers.enableResize();
+  this.helpers.enableKeyboard();
 
   // Fetch initial links
   this.reset();
-
-  this.helpers.enableKeyboard();
-}
-
-// Generic item parsing and rendering
-function ItemList(container, template) {
-  var that = this;
-  this.list = [];
-
-  this.parse = function(list) {
-    that.list = that.list.concat(list);
-    this.render();
-  }
-
-  this.render = function() {
-    for (var i = 0; i < that.list.length; i++) {
-      var item = that.list[i].data;
-      var elem = template({ item: item });
-      container.append(elem);
-    }
-  }
 }
 
 // YouTube API callback
