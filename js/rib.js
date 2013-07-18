@@ -780,7 +780,10 @@ function MainView(config) {
           // o - choose subreddits
           case 111: case 79:
             // hacky hack way because my code layering is dumb
-            $('a[data-name=subreddits]').trigger('click');
+            if ($('#subreddits-container').css('right') == '-310px') {
+              $('a[data-name=subreddits]').trigger('click');
+              $('#subreddits-container').stop(true, true);
+            }
             $('#subreddits-controls .add').trigger('click');
             e.preventDefault();
             break;
