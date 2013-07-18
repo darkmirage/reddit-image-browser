@@ -108,7 +108,7 @@ function RedditImageBrowser(config) {
   rib.config = {};
   rib.config.cage_id = '#ribcage';
   rib.config.sub_id = '#subreddits';
-  rib.config.defaults = ['aww', 'pics', 'cringepics', 'gifs', 'videos'];
+  rib.config.defaults = ['aww', 'pics', 'gifs', 'EarthPorn'];
   rib.config.hover_scroll = false;
   rib.config.scroll_width = 860;
 
