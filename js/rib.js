@@ -747,7 +747,6 @@ function MainView(config) {
     },
     enableInputDevices: function() {
       var mouseHandler = function(e) {
-        console.debug(e);
         if (e.originalEvent.wheelDelta > 0)
           that.helpers.selectPrev();
         else
