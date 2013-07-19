@@ -573,6 +573,10 @@ function MainView(config) {
     }
   }
 
+  this.zoom = function(step) {
+    // TODO
+  }
+
   var resizeTimer;
   this.resize = function(animate) {
     var doResize = function() {
@@ -592,8 +596,9 @@ function MainView(config) {
 
       ratio = selected.attr('data-ratio');
 
-      if (that.selected().ratio > 0)
+      if (that.selected().ratio > 0) {
         params['max-width'] = that.selected().ratio * height;
+      }
 
       // curr.css('max-height', curr.height() + 'px');
       curr.stop();
@@ -740,7 +745,15 @@ function MainView(config) {
         that.select($(this).attr('data-index'));
       });
     },
-    enableKeyboard: function() {
+    enableInputDevices: function() {
+      var mouseHandler = function(e) {
+        console.debug(e);
+        if (e.originalEvent.wheelDelta > 0)
+          that.helpers.selectPrev();
+        else
+          that.helpers.selectNext();
+      }
+
       var keyHandler = function(e) {
         if (e.target.nodeName == 'INPUT')
           return;
@@ -753,6 +766,14 @@ function MainView(config) {
           // k - prev
           case 107: case 75:
             that.helpers.selectPrev();
+            break;
+          // u - zoom in
+          case 117: case 85:
+            that.zoom();
+            break;
+          // i - reset zoom
+          case 105: case 73:
+            that.resize();
             break;
           // v, enter - open link
           case 118: case 86: case 13:
@@ -798,6 +819,8 @@ function MainView(config) {
       }
 
       $(document).on('keydown', keyHandler);
+      $(document).on('mousewheel', mouseHandler);
+      $(document).on('wheel', mouseHandler);
     },
     hide: function(selection) {
       selection
@@ -861,7 +884,7 @@ function MainView(config) {
 
   this.helpers.enableScroll();
   this.helpers.enableResize();
-  this.helpers.enableKeyboard();
+  this.helpers.enableInputDevices();
 
   // Fetch initial links
   this.reset();
