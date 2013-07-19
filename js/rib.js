@@ -348,6 +348,8 @@ function RedditImageBrowser(config) {
     if (rib.config.first) {
       $('#first').show();
       $(document).keypress(function() { $('#first').hide(); });
+      $(document).on('mousewheel', function() { $('#first').hide(); });
+      $(document).on('wheel', function() { $('#first').hide(); });
     }
   }
 }
