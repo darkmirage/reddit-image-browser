@@ -49,6 +49,7 @@ h1, h2, h3 {
 #header {
   background: #252525;
   text-align: center;
+  position: relative;
 }
 
 #header .content {
@@ -536,14 +537,17 @@ html, body {
 }
 
 #noty {
+  background: #252525;
+  color: #eee;
   position: absolute;
   top: 0px;
   z-index: 6;
-  padding-top: 10px;
+  padding: 10px;
+  height: 40px;
   width: 100%;
   text-align: center;
   text-transform: lowercase;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* FAQ */

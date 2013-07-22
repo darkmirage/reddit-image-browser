@@ -791,19 +791,21 @@ function MainView(config) {
           // s - simplify UI
           case 115: case 83:
             if (simple) {
-              $('#post-meta').css('margin-top', '0');
               simple.remove();
               simple = null;
+              $('#ribcage, #header').css('top', 'auto');
+              $('#loading').css('top', '5px');
             } else {
-              $('#post-meta').css('margin-top', '40px');
               simple = $('<div></div>');
               simple.html('Press f again to unhide UI').attr('id', 'noty');
+              $('#ribcage, #header').css('top', '-100px');
+              $('#loading').css('top', '75px');
               $('body').append(simple);
               setTimeout(function() {
                 simple.fadeOut(1500);
               }, 3000)
             }
-            $('#link-container, #header').toggle();
+
             that.resize();
             break;
           // o - choose subreddits
