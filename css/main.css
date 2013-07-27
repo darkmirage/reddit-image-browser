@@ -1,7 +1,8 @@
 /* Reddit Image Browser */
 
-* {
+body, div, span, em, sup, h1, h2, h3, h4, ol, ul, img {
   -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 

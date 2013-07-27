@@ -798,11 +798,13 @@ function MainView(config) {
               simple = null;
               $('#ribcage, #header').css('top', 'auto');
               $('#loading').css('top', '5px');
+              $('#wrap, body').css('overflow-y', 'auto');
             } else {
               simple = $('<div></div>');
-              simple.html('Press f again to unhide UI').attr('id', 'noty');
+              simple.html('Press s again to unhide UI').attr('id', 'noty');
               $('#ribcage, #header').css('top', '-100px');
               $('#loading').css('top', '75px');
+              $('#wrap, body').css('overflow-y', 'hidden');
               $('body').append(simple);
               setTimeout(function() {
                 simple.fadeOut(1500);
