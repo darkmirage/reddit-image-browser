@@ -89,7 +89,7 @@ var cookies = {
     }
     return false;
   }
-}
+};
 
 // Underscore.js templates
 var templates = {};
@@ -231,13 +231,15 @@ function RedditImageBrowser(config) {
       return;
     }
 
+    var checkRemainder = function() {
+      remain--;
+      if (remain === 0) {
+        rib.displayHot();
+      }
+    };
+
     for (var i = 0; i < subs.length; i++) {
-      rib.fetchSubreddit(subs[i], function() {
-        remain--;
-        if (remain === 0) {
-          rib.displayHot();
-        }
-      });
+      rib.fetchSubreddit(subs[i], checkRemainder);
     }
   };
 
@@ -371,6 +373,7 @@ function MainView(config) {
   var scrolling = false;
   var loading = false;
   var selected = null;
+  var selected_index = 0;
   var simple = null;
 
   // These operate on the Subreddit list
@@ -517,13 +520,13 @@ function MainView(config) {
     var elem = $('span[data-index=' + index + ']');
     elem.addClass('selected');
     selected = elem;
-    console.debug(elem);
+    selected_index = index;
     that.display(that.links[index]);
     that.helpers.scrollCheck();
   };
 
   this.selected = function() {
-    return that.links[selected.attr('data-index')];
+    return that.links[selected_index];
   };
 
   this.format = function() {
@@ -597,8 +600,6 @@ function MainView(config) {
       height = $(window).height() - height - 80;
 
       var params = { 'max-height': height + 'px'};
-
-      ratio = selected.attr('data-ratio');
 
       if (that.selected().ratio > 0) {
         params['max-width'] = that.selected().ratio * height;
@@ -701,14 +702,14 @@ function MainView(config) {
         that.helpers.scrollTo(pos + selected.width() + 10 - config.scroll_width);
     },
     selectNext: function() {
-      var index = parseInt(selected.attr('data-index'), 10) + 1;
+      var index = selected_index + 1;
       if (index >= that.links.length)
         return;
       that.select(index);
       that.helpers.scrollCheck();
     },
     selectPrev: function() {
-      var index = parseInt(selected.attr('data-index'), 10) - 1;
+      var index = selected_index - 1;
       if (index < 0)
         return;
       that.select(index);
