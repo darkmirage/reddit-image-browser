@@ -53,7 +53,7 @@ function fetcher(args, callback) {
 var params = {};
 function readParams() {
   var query = window.location.search;
-  if (query.length == 0)
+  if (query.length === 0)
     return;
   if (query[0] == '?') query = query.substr(1);
   var list = query.split('&');
@@ -78,7 +78,7 @@ var cookies = {
   get: function(name) {
     if (cookies.supports_html5_storage()) {
       var val = localStorage.getItem(name);
-      return val === undefined || !val || val == null ? false : localStorage.getItem(name).split('|');
+      return val === undefined || !val || val === null ? false : localStorage.getItem(name).split('|');
     }
     return false;
   },
@@ -124,12 +124,12 @@ function RedditImageBrowser(config) {
       }
     }
     rib.cage = $(rib.config.cage_id);
-    rib.subview = $(rib.config.sub_id)
+    rib.subview = $(rib.config.sub_id);
 
     var subs = cookies.get('subreddits');
     if (subs) rib.config.defaults = subs;
     else rib.config.first = true;
-  }
+  };
 
   // Parse configurations
   rib.set(config);
@@ -139,17 +139,17 @@ function RedditImageBrowser(config) {
     if (callback === undefined)
       callback = rib.parse;
     fetcher(args, callback);
-  }
+  };
 
   rib.add = function(name) {
     $('a[data-name=' + name + ']').addClass('active');
     rib.main.add(name);
-  }
+  };
 
   rib.remove = function(name) {
     $('a[data-name=' + name + ']').removeClass('active');
     rib.main.remove(name);
-  }
+  };
 
   rib.enableSubreddits = function(elem) {
     if (elem === undefined)
@@ -160,7 +160,7 @@ function RedditImageBrowser(config) {
     else
       rib.add($(this).attr('data-name'));
     });
-  }
+  };
 
   rib.displaySubreddit = function(json) {
     var elem = $(templates.subreddit({ item: json.data }));
@@ -168,27 +168,27 @@ function RedditImageBrowser(config) {
     rib.enableSubreddits(elem);
     elem.hide();
     elem.fadeIn(500);
-  }
+  };
 
   rib.addSubreddits = function(json) {
     var list = json.data.children;
     for (var i = 0; i < list.length; i++) {
       rib.addSubreddit(list[i]);
     }
-  }
+  };
 
   rib.addSubreddit = function(json) {
     if (_.indexOf(rib.subreddits, json.data.display_name) == -1) {
       rib.subreddits.push(json.data.display_name);
       rib.displaySubreddit(json);
     }
-  }
+  };
 
   rib.displayHot = function() {
     rib.fetch({ type: 'subreddits', name: 'popular' }, function(json) {
       rib.addSubreddits(json);
     });
-  }
+  };
 
   rib.fetchSubreddit = function(name, callback) {
       rib.fetch({ type: 'r', name: name + '/about' }, function(json) {
@@ -197,7 +197,7 @@ function RedditImageBrowser(config) {
         if (callback !== undefined)
           callback(json);
       });
-  }
+  };
 
   rib.initSubreddits = function() {
     var form = $('#subreddits-add').hide();
@@ -209,7 +209,7 @@ function RedditImageBrowser(config) {
       .keypress(function(e) {
         if (e.which == 13) {
           e.preventDefault();
-          if (input.val() != '')
+          if (input.val() !== '')
             rib.fetchSubreddit(input.val());
           input.val('');
           input.blur();
@@ -218,15 +218,15 @@ function RedditImageBrowser(config) {
       });
 
     add.click(function(e) {
-        add.hide();
-        form.show();
-        input.focus();
-        e.preventDefault();
-      })
+      add.hide();
+      form.show();
+      input.focus();
+      e.preventDefault();
+    });
 
     var subs = rib.config.defaults;
     var remain = subs.length;
-    if (remain == 0) {
+    if (remain === 0) {
       rib.displayHot();
       return;
     }
@@ -234,12 +234,12 @@ function RedditImageBrowser(config) {
     for (var i = 0; i < subs.length; i++) {
       rib.fetchSubreddit(subs[i], function() {
         remain--;
-        if (remain == 0) {
+        if (remain === 0) {
           rib.displayHot();
         }
       });
     }
-  }
+  };
 
   rib.enableHandles = function() {
     var toggleSub = false;
@@ -269,7 +269,7 @@ function RedditImageBrowser(config) {
       });
 
       rib.subview.parent().find('.close').hide().on('click', hide);
-    }
+    };
 
     var enableGuide = function(handle) {
       var guide = $('#guide');
@@ -286,7 +286,7 @@ function RedditImageBrowser(config) {
         guide.fadeOut(300);
         $('#dark').fadeOut(0);
       }).click(function(e) { e.preventDefault(); });
-    }
+    };
 
     var enableFAQ = function(handle) {
       var show = function() {
@@ -309,7 +309,7 @@ function RedditImageBrowser(config) {
           hide();
         e.preventDefault();
       });
-    }
+    };
 
     enableSub($('a[data-name=subreddits]'));
     enableGuide($('a[data-name=guide]'));
@@ -323,13 +323,13 @@ function RedditImageBrowser(config) {
         $('a[data-name=faq]').trigger('click');
       if (toggleSub)
         $('a[data-name=subreddits]').trigger('click');
-    }
+    };
     $('#dark, .page').click(hideAll);
     $(document).on('keydown', function(e) {
       if (e.which == 27) hideAll();
     });
     $('#faq .page-content').click(function(e) { e.stopPropagation(); });
-  }
+  };
 
   rib.init = function() {
     // Initialize main view
@@ -351,7 +351,7 @@ function RedditImageBrowser(config) {
       $(document).on('mousewheel', function() { $('#first').hide(); });
       $(document).on('wheel', function() { $('#first').hide(); });
     }
-  }
+  };
 }
 
 // Item parsing and rendering for the main links
@@ -381,7 +381,7 @@ function MainView(config) {
       i = _.indexOf(that.subs, entry);
     }
     that.reset();
-  }
+  };
 
   this.add = function(entry) {
     if (_.indexOf(that.subs, entry) != -1)
@@ -390,7 +390,7 @@ function MainView(config) {
     limit += 10;
     that.reset();
     cookies.set('subreddits', that.subs);
-  }
+  };
 
   // These operate on the retrieved links
   this.parse = function(json, url) {
@@ -400,7 +400,7 @@ function MainView(config) {
     that.render();
     loading = false;
     that.helpers.hideLoading();
-  }
+  };
 
   this.more = function(callback) {
     if (loading)
@@ -409,7 +409,7 @@ function MainView(config) {
     that.helpers.showLoading();
 
     args = {};
-    if (that.subs.length == 0) {
+    if (that.subs.length === 0) {
       args.type = 'hot';
     } else {
       var name = that.subs.join('+');
@@ -417,7 +417,7 @@ function MainView(config) {
       args.name = name;
     }
 
-    if (after != null)
+    if (after !== null)
       args.after = after;
 
     that.fetch(args, function(json, url) {
@@ -426,7 +426,7 @@ function MainView(config) {
         callback(json);
     });
     return true;
-  }
+  };
 
   this.reset = function(callback) {
     cookies.set('subreddits', that.subs);
@@ -446,18 +446,19 @@ function MainView(config) {
         that.reset(callback);
       }, 100);
     }
-  }
+  };
 
   // Display the selected item
   this.display = function(link) {
     var content = $('<div></div>').addClass('shadow');
+    var elem = null;
 
     if (link.type == 'image') {
-      var elem = link.img;
+      elem = link.img;
       elem.addClass('post-content');
     }
     else if (link.type == 'album') {
-      var elem = $('<iframe></iframe>');
+      elem = $('<iframe></iframe>');
       elem
         .addClass('post-content')
         .attr('frameborder', 0)
@@ -465,10 +466,10 @@ function MainView(config) {
       link.iframe = elem;
     }
     else if (link.type == 'video') {
-      var elem = link.video;
+      elem = link.video;
     }
     else { //if (link.type == 'self' || link.type == 'page') {
-      var elem = $('<div></div>');
+      elem = $('<div></div>');
       elem
         .addClass('self-post')
         .html(templates.self({ item: link.data }));
@@ -485,7 +486,7 @@ function MainView(config) {
 
     curr.append(content);
     this.resize(false);
-  }
+  };
 
   // Basic rendering of thumbnails with no paging
   this.render = function() {
@@ -494,14 +495,14 @@ function MainView(config) {
 
     update
       .attr('data-index', function(d, i) { return i; })
-      .style('left', function(d, i) { return (5 + i * 75) + 'px' });
+      .style('left', function(d, i) { return (5 + i * 75) + 'px'; });
 
     update.exit()
       .call(that.helpers.hide);
 
     update.enter()
       .append('span')
-      .style('left', function(d, i) { return (5 + i * 75) + 'px' })
+      .style('left', function(d, i) { return (5 + i * 75) + 'px'; })
       .html(function(d) { return templates.link({ item: d.data }); })
       .attr('class', 'thumbnail')
       .attr('data-name', function(d, i) { return d.data.name; })
@@ -509,20 +510,21 @@ function MainView(config) {
       .call(that.helpers.show);
 
     that.helpers.enableLinks();
-  }
+  };
 
   this.select = function(index) {
     container.find('.thumbnail').removeClass('selected');
     var elem = $('span[data-index=' + index + ']');
     elem.addClass('selected');
     selected = elem;
+    console.debug(elem);
     that.display(that.links[index]);
     that.helpers.scrollCheck();
-  }
+  };
 
   this.selected = function() {
     return that.links[selected.attr('data-index')];
-  }
+  };
 
   this.format = function() {
     that.links = _.compact(that.links);
@@ -551,7 +553,7 @@ function MainView(config) {
         d.thumbnail = './img/self.png';
         link.type = 'self';
       }
-      else if (d.thumbnail == '' || d.thumbnail == 'default') {
+      else if (d.thumbnail === '' || d.thumbnail == 'default') {
         if (link.type == 'image')
           d.thumbnail = './img/img.png';
         else
@@ -561,7 +563,7 @@ function MainView(config) {
         d.thumbnail = './img/nsfw.png';
       }
 
-      if (d.media != null) {
+      if (d.media !== null) {
         that.helpers.processVideo(link);
         link.type = 'video';
       }
@@ -573,11 +575,11 @@ function MainView(config) {
       // preload images
       that.helpers.preload(link);
     }
-  }
+  };
 
   this.zoom = function(step) {
     // TODO
-  }
+  };
 
   var resizeTimer;
   this.resize = function(animate) {
@@ -608,7 +610,7 @@ function MainView(config) {
         curr.animate(params, 500);
       else
         curr.css(params);
-    }
+    };
 
     if (animate) {
       clearTimeout(resizeTimer);
@@ -616,7 +618,7 @@ function MainView(config) {
     } else {
       doResize();
     }
-  }
+  };
 
   // Helper functions
   this.helpers = {
@@ -644,7 +646,7 @@ function MainView(config) {
       if (i === undefined)
         i = 0;
 
-      if (!scrolling && i >= 0 || rate == 0)
+      if (!scrolling && i >= 0 || rate === 0)
         return;
 
       var prev = container.scrollLeft();
@@ -661,7 +663,7 @@ function MainView(config) {
           that.more();
         }
 
-        if (container.scrollLeft() == 0) {
+        if (container.scrollLeft() === 0) {
           $('#scroll-left').hide();
         } else {
           $('#scroll-left').show();
@@ -688,7 +690,7 @@ function MainView(config) {
       that.helpers.scroll(-(config.scroll_width - 100), -1);
     },
     scrollCheck: function(target) {
-      var pos = parseInt(selected.css('left'), 10)
+      var pos = parseInt(selected.css('left'), 10);
       var scroll_pos = container.scrollLeft();
       if (pos + selected.width() >= scroll_pos + config.scroll_width) {
         that.helpers.scrollTo(pos - 5);
@@ -699,14 +701,14 @@ function MainView(config) {
         that.helpers.scrollTo(pos + selected.width() + 10 - config.scroll_width);
     },
     selectNext: function() {
-      var index = parseInt(selected.attr('data-index')) + 1;
+      var index = parseInt(selected.attr('data-index'), 10) + 1;
       if (index >= that.links.length)
         return;
       that.select(index);
       that.helpers.scrollCheck();
     },
     selectPrev: function() {
-      var index = parseInt(selected.attr('data-index')) - 1;
+      var index = parseInt(selected.attr('data-index'), 10) - 1;
       if (index < 0)
         return;
       that.select(index);
@@ -724,7 +726,7 @@ function MainView(config) {
         $('#scroll-right').hover(function() {
           scrolling = true;
           that.helpers.scroll(10);
-        }, function() { scrolling = false });
+        }, function() { scrolling = false; });
       } else {
         $('#scroll-left').click(function(e) {
           that.helpers.scrollPrevPage();
@@ -753,7 +755,7 @@ function MainView(config) {
           that.helpers.selectPrev();
         else
           that.helpers.selectNext();
-      }
+      };
 
       var keyHandler = function(e) {
         if (e.target.nodeName == 'INPUT')
@@ -778,7 +780,7 @@ function MainView(config) {
             break;
           // v, enter - open link
           case 118: case 86: case 13:
-            window.open(d.data.url, '_blank');
+            window.open(d.url, '_blank');
             break;
           // c, n - open comments
           case 99: case 67: case 110: case 78:
@@ -786,7 +788,7 @@ function MainView(config) {
             break;
           // r - open subreddit page
           case 114: case 82:
-            window.open('http://www.reddit.com/r/' + d.data.subreddit, '_blank');
+            window.open('http://www.reddit.com/r/' + d.subreddit, '_blank');
             break;
           // s - simplify UI
           case 115: case 83:
@@ -803,7 +805,7 @@ function MainView(config) {
               $('body').append(simple);
               setTimeout(function() {
                 simple.fadeOut(1500);
-              }, 3000)
+              }, 3000);
             }
 
             that.resize();
@@ -819,7 +821,7 @@ function MainView(config) {
             e.preventDefault();
             break;
         }
-      }
+      };
 
       $(document).on('keydown', keyHandler);
       $(document).on('mousewheel', mouseHandler);
@@ -843,7 +845,7 @@ function MainView(config) {
         .transition()
         .duration(500)
         .style('opacity', '1.0')
-        .style('width', '70px')
+        .style('width', '70px');
     },
     preload: function(link) {
       if (link.type == 'image') {
@@ -862,7 +864,7 @@ function MainView(config) {
     processVideo: function(link) {
       var elem = $('<div></div>');
       elem.html(that.helpers.htmlUnescape(link.data.media_embed.content));
-      var frame = elem.find('iframe')
+      var frame = elem.find('iframe');
       // Preserve aspect ratio for video iframes
       var ratio = frame.attr('width') / frame.attr('height');
       frame
@@ -880,7 +882,7 @@ function MainView(config) {
           .replace(/&gt;/g, '>')
           .replace(/&amp;/g, '&');
       }
-  }
+  };
 
   // Implements fetching in this module
   this.fetch = fetcher;

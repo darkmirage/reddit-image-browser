@@ -162,17 +162,17 @@
 </script>
 
 <script type="text/template" id="template-link">
-  <a href="<%= item.url %>"><h2><%= item.title %></h2></a>
+  <a href="<%= item.url %>" target="_blank"><h2><%= item.title %></h2></a>
 </script>
 
 <script type="text/template" id="template-self">
 <% if (item.selftext != '') { %>
   <div class="self-text post-content">
     <%= item.selftext %>
-    <a href="http://www.reddit.com/user/<%= item.author %>">&mdash; <%= item.author %></a>
+    <a href="http://www.reddit.com/user/<%= item.author %>" target="_blank">&mdash; <%= item.author %></a>
   </div>
 <% } else { %>
-  <a href="<%= item.url %>" class="empty-content">
+  <a href="<%= item.url %>" class="empty-content" target="_blank">
   <div>
     <span>Click to open link</span>
     Alternatively, press <em>v</em> on your keyboard
