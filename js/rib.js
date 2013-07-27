@@ -292,12 +292,14 @@ function RedditImageBrowser(config) {
 
     var enableFAQ = function(handle) {
       var show = function() {
+        rib.main.enableNav = false;
         faqView.show();
         handle.addClass('active');
         toggleFAQ = true;
         $('#dark').stop(true, false).fadeIn(500);
       };
       var hide = function() {
+        rib.main.enableNav = true;
         faqView.hide();
         handle.removeClass('active');
         toggleFAQ = false;
@@ -375,6 +377,7 @@ function MainView(config) {
   var selected = null;
   var selected_index = 0;
   var simple = null;
+  this.enableNav = true;
 
   // These operate on the Subreddit list
   this.remove = function(entry) {
@@ -752,6 +755,7 @@ function MainView(config) {
     },
     enableInputDevices: function() {
       var mouseHandler = function(e) {
+        if (!that.enableNav) return;
         if (e.originalEvent.wheelDelta > 0)
           that.helpers.selectPrev();
         else
@@ -759,6 +763,7 @@ function MainView(config) {
       };
 
       var keyHandler = function(e) {
+        if (!that.enableNav) return;
         if (e.target.nodeName == 'INPUT')
           return;
         var d = that.selected().data;
